@@ -173,5 +173,14 @@ model_dictionary_rsds_historical_badc = [
     {'model_name': 'NorCPM1', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'}
 ]
 
-
+season_months = {
+    "DJF": [12, 1, 2],
+    "MAM": [3, 4, 5],
+    "JJA": [6, 7, 8],
+    "JJAS": [6, 7, 8, 9],
+    "SON": [9, 10, 11],
+    "SOND": [9, 10, 11, 12],
+    "NDJF": [11, 12, 1, 2],
+    "DJFM": [12, 1, 2, 3]
+}
 

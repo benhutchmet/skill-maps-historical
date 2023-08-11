@@ -380,5 +380,47 @@ def load_historical_data(model_dict, var, region):
     # Return the historical data dictionary
     return historical_data
             
+# Now we want to define a function which will constrain the historical data
+# to given years
+# this function takes as arguments: the historical data dictionary, the start year and the end year, the season, the model and the member index
+def constrain_historical_data_season(historical_data, start_year, end_year, season, model, member):
+    """
+    Constrains the historical data to given years and season.
+    """
+
+    # Extract the data for this model and member
+    data = historical_data[model][member]
+
+    # Extract the months from the season string
+    months = dic.season_months[season]
+
+    # Check that the months are not empty
+    # and are a list of integers
+    if len(months) == 0:
+        print("Error, months are empty")
+        return None
+    elif not isinstance(months, list):
+        print("Error, months are not a list")
+        return None
+    elif not all(isinstance(item, int) for item in months):
+        print("Error, months are not all integers")
+        return None
+
+    # Format this as a try except block
+    try:
+        # Constrain the data to the given years
+        data = data.sel(time=slice(str(start_year), str(end_year)))
+
+        # Select the months from the dataset
+        data = data.sel(time=data['time.month'].isin(months))
+
+        # Return the data
+        return data
+    except e as err:
+        print("Error, failed to constrain data: ", err)
+        return None
+    
+    
+    
 
 
