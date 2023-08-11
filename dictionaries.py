@@ -124,3 +124,19 @@ model_dictionary_sfcWind_historical_badc = [
     {'model_name': 'MIROC6', 'runs': '1-10', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
     {'model_name': 'IPSL-CM6A-LR', 'runs': '1-31', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'}
 ]
+
+# Set up the model_dictionary for the psl historical models
+# stored in the CMIP6 archive on JASMIN (badc)
+model_dictionary_psl_historical_badc = [
+    {'model_name': 'BCC-CSM2-MR', 'runs': '1-3', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
+    {'model_name': 'MPI-ESM1-2-HR', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
+    {'model_name': 'CanESM5', 'runs': '1-25', 'init_schemes': '1', 'physics_scheme': '1,2', 'forcing_scheme': '1'},
+    {'model_name': 'CMCC-CM2-SR5', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
+    {'model_name': 'HadGEM3-GC31-MM', 'runs': '1-4', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '3'},
+    {'model_name': 'EC-Earth3', 'runs': '101-150', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
+    {'model_name': 'MPI-ESM1-2-LR', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
+    {'model_name': 'FGOALS-f3-L', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
+    {'model_name': 'MIROC6', 'runs': '1-50', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
+    {'model_name': 'IPSL-CM6A-LR', 'runs': '1-31', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'}
+    {'model_name': 'NorCPM1', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'}
+]
