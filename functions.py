@@ -391,6 +391,11 @@ def constrain_historical_data_season(historical_data, start_year, end_year, seas
     # Extract the data for this model and member
     data = historical_data[model][member]
 
+    # Verify that the data is an xarray dataset
+    if not isinstance(data, xr.Dataset):
+        print("Error, data is not an xarray dataset")
+        return None
+
     # Extract the months from the season string
     months = dic.season_months[season]
 
@@ -420,7 +425,40 @@ def constrain_historical_data_season(historical_data, start_year, end_year, seas
         print("Error, failed to constrain data: ", err)
         return None
     
+
+# Now we want to define a function which will calculate anomalies for the historical data
+# This function takes as arguments: the historical data dictionary
+# which contains the data for the selected years and season
+# the model name and the member index
+def calculate_historical_anomalies_season(historical_data, model, member):
+    """
+    Calculates the anomalies for the historical data.
+    """
+
+    # Extract the data for this model and member
+    data = historical_data[model][member]
+
+    # Verify that the data is an xarray dataset
+    if not isinstance(data, xr.Dataset):
+        print("Error, data is not an xarray dataset")
+        return None
     
-    
+    # Check that the xarray dataset contains values other than NaN
+    if data.isnull().all():
+        print("Error, data contains only NaN values")
+        return None
+
+    try:
+        # Calculate the mean over the time axis
+        data_climatology = data.mean(dim='time')
+
+        # Calculate the anomalies
+        data_anomalies = data - data_climatology
+
+        # Return the anomalies
+        return data_anomalies
+    except e as err:
+        print("Error, failed to calculate anomalies: ", err)
+        return None
 
 
