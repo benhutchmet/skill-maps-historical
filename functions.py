@@ -319,6 +319,66 @@ def call_mergetime_regrid(model_dict, var, region):
                     return None
 
 
+# Now we want to define a function to load the historical data
+# As a dictionary of xarray datasets for each model
+# This will have dimensions: [model, members, time, lat, lon]
+# This function will take as arguments: the dictionary of models, the variable name, the region name
+def load_historical_data(model_dict, var, region):
+    """
+    Loads the historical data as a dictionary of xarray datasets for each model.
+    """
+
+    # Initialize the dictionary
+    historical_data = {}
+
+    # Loop over the models
+    # these are define by the model_name key in the dictionary
+    for model in model_dict:
+        # Print the model name
+        print("processing model: ", model['model_name'])
+
+        # Initialize the member dictionary
+        member_dict = {}
+
+        # Set up the directory path
+        # Where all of the members (each unique r?i?p?f? combination) are stored
+        # We want the regridded files
+        regrid_files = dic.canari_base_path_historical + '/' + var + '/' + model + '/regrid' + '/' + var + '_' + 'Amon' + '_' + model + '_' + 'historical' + '_' + 'r?i?p?f?' + '_' + region + '_regrid.nc'
+
+        # Check that the regrid files exist
+        if len(glob.glob(regrid_files)) == 0:
+            print("Error, regrid files do not exist")
+            return None
+        
+        # Count the number of files
+        num_files = len(glob.glob(regrid_files))
+
+        # Print the number of files
+        print("number of files for model ", model['model_name'], ": ", num_files)
+
+        # Set up the member counter
+        member = 0
+
+        # Set up the files
+        files = glob.glob(regrid_files)
+
+        # Loop over the files
+        for file in files:
+            
+            # Load the data for this member
+            data = xr.open_dataset(file, chunks={'time': 50})
+
+            # Add this data to the member dictionary
+            member_dict[member] = data
+
+            # Increment the member counter
+            member += 1
+
+        # Add the member dictionary to the historical data dictionary
+        historical_data[model['model_name']] = member_dict
+
+    # Return the historical data dictionary
+    return historical_data
             
 
 
