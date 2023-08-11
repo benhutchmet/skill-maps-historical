@@ -193,4 +193,114 @@ def regrid(model, var, run, init, physics, forcing, region):
             
 # Now we want to write a function which will call the mergetime and regrid functions
 # for each given model, run, init, physics and forcing combination
-#
+# This function will take as arguments: the dictionary of models, the variable name, the region name
+def call_mergetime_regrid(model_dict, var, region):
+    """
+    Loops over the models, runs, inits, physics and forcings and calls the mergetime and regrid functions.
+    """
+
+    # For example, the model_dict is defined like this:
+    #     model_dictionary_psl_historical_badc = [
+    #     {'model_name': 'BCC-CSM2-MR', 'runs': '1-3', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
+    #     {'model_name': 'MPI-ESM1-2-HR', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
+    #     {'model_name': 'CanESM5', 'runs': '1-25', 'init_schemes': '1', 'physics_scheme': '1,2', 'forcing_scheme': '1'},
+    #     {'model_name': 'CMCC-CM2-SR5', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
+    #     {'model_name': 'HadGEM3-GC31-MM', 'runs': '1-4', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '3'},
+    #     {'model_name': 'EC-Earth3', 'runs': '101-150', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
+    #     {'model_name': 'MPI-ESM1-2-LR', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
+    #     {'model_name': 'FGOALS-f3-L', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
+    #     {'model_name': 'MIROC6', 'runs': '1-50', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
+    #     {'model_name': 'IPSL-CM6A-LR', 'runs': '1-31', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'}
+    #     {'model_name': 'NorCPM1', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'}
+    # ]
+
+    # Loop over the models
+    # these are define by the model_name key in the dictionary
+    for model in model_dict:
+        # Print the model name
+        print("processing model: ", model['model_name'])
+
+        # Extract the runs for this model
+        runs = model['runs']
+
+        # if the runs are a range e.g. 1-3, then split them
+        if '-' in runs:
+            runs = runs.split('-')
+            # convert the strings to integers
+            runs = list(map(int, runs))
+            # create a list of runs
+            runs = list(range(runs[0], runs[1]+1))
+        elif ',' in runs:
+            runs = runs.split(',')
+            # convert the strings to integers
+            runs = list(map(int, runs))
+        else:
+            runs = [int(runs)]
+
+        # Print the runs
+        print("runs for model ", model['model_name'], ": ", runs)
+
+        # Loop over the runs
+        for run in runs:
+
+            # Print the run being processed
+            print("processing run: ", run)
+
+            # Extract the initialization schemes for this model
+            init_schemes = model['init_schemes']
+
+            # if the init schemes are not a single number, then echo an error
+            # and exit
+            if ',' in init_schemes:
+                print("Error, init schemes are not a single number")
+                return None
+            elif '-' in init_schemes:
+                print("Error, init schemes are not a single number")
+                return None
+            
+            # Extract the physics schemes for this model
+            physics_schemes = model['physics_scheme']
+            
+            # If the physics schemes are a range, then split them
+            # and loop over them
+            if '-' in physics_schemes:
+                physics_schemes = physics_schemes.split('-')
+                # convert the strings to integers
+                physics_schemes = list(map(int, physics_schemes))
+                # create a list of init schemes
+                physics_schemes = list(range(physics_schemes[0], physics_schemes[1]+1))
+            elif ',' in physics_schemes:
+                physics_schemes = physics_schemes.split(',')
+                # convert the strings to integers
+                physics_schemes = list(map(int, physics_schemes))
+
+                # Loop over the init schemes
+                for init in physics_schemes:
+
+                    # Extract the forcing schemes for this model
+                    forcing_schemes = model['forcing_scheme']
+
+                    # if the forcing schemes are not a single number, then echo an error
+                    # and exit
+                    if ',' in forcing_schemes:
+                        print("Error, forcing schemes are not a single number")
+                        return None
+                    elif '-' in forcing_schemes:
+                        print("Error, forcing schemes are not a single number")
+                        return None
+                    else:
+                        forcing_schemes = [int(forcing_schemes)]
+
+                    # Merge the time axis of the files
+                    # using the merge_time_axis function
+                    merged_file = merge_time_axis(model['model_name'], var, run, init, physics, forcing, dic.base_path_example)
+                    
+    
+
+
+            else:
+                init_schemes = [int(init_schemes)]
+                
+            
+
+
