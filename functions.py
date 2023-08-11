@@ -196,23 +196,8 @@ def regrid(model, var, run, init, physics, forcing, region):
 # This function will take as arguments: the dictionary of models, the variable name, the region name
 def call_mergetime_regrid(model_dict, var, region):
     """
-    Loops over the models, runs, inits, physics and forcings and calls the mergetime and regrid functions.
+    Loops over the models, runs, inits, physics and forcings defined in the model_dict and calls the mergetime and regrid functions.
     """
-
-    # For example, the model_dict is defined like this:
-    #     model_dictionary_psl_historical_badc = [
-    #     {'model_name': 'BCC-CSM2-MR', 'runs': '1-3', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
-    #     {'model_name': 'MPI-ESM1-2-HR', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
-    #     {'model_name': 'CanESM5', 'runs': '1-25', 'init_schemes': '1', 'physics_scheme': '1,2', 'forcing_scheme': '1'},
-    #     {'model_name': 'CMCC-CM2-SR5', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
-    #     {'model_name': 'HadGEM3-GC31-MM', 'runs': '1-4', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '3'},
-    #     {'model_name': 'EC-Earth3', 'runs': '101-150', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
-    #     {'model_name': 'MPI-ESM1-2-LR', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
-    #     {'model_name': 'FGOALS-f3-L', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
-    #     {'model_name': 'MIROC6', 'runs': '1-50', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
-    #     {'model_name': 'IPSL-CM6A-LR', 'runs': '1-31', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'}
-    #     {'model_name': 'NorCPM1', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'}
-    # ]
 
     # Loop over the models
     # these are define by the model_name key in the dictionary
@@ -247,14 +232,14 @@ def call_mergetime_regrid(model_dict, var, region):
             print("processing run: ", run)
 
             # Extract the initialization schemes for this model
-            init_schemes = model['init_schemes']
+            init_scheme = model['init_schemes']
 
             # if the init schemes are not a single number, then echo an error
             # and exit
-            if ',' in init_schemes:
+            if ',' in init_scheme:
                 print("Error, init schemes are not a single number")
                 return None
-            elif '-' in init_schemes:
+            elif '-' in init_scheme:
                 print("Error, init schemes are not a single number")
                 return None
             
@@ -275,32 +260,65 @@ def call_mergetime_regrid(model_dict, var, region):
                 physics_schemes = list(map(int, physics_schemes))
 
                 # Loop over the init schemes
-                for init in physics_schemes:
+                for p in physics_schemes:
 
                     # Extract the forcing schemes for this model
-                    forcing_schemes = model['forcing_scheme']
+                    forcing_scheme = model['forcing_scheme']
 
                     # if the forcing schemes are not a single number, then echo an error
                     # and exit
-                    if ',' in forcing_schemes:
+                    if ',' in forcing_scheme:
                         print("Error, forcing schemes are not a single number")
                         return None
-                    elif '-' in forcing_schemes:
+                    elif '-' in forcing_scheme:
                         print("Error, forcing schemes are not a single number")
                         return None
                     else:
-                        forcing_schemes = [int(forcing_schemes)]
+                        forcing_scheme = [int(forcing_scheme)]
 
                     # Merge the time axis of the files
                     # using the merge_time_axis function
-                    merged_file = merge_time_axis(model['model_name'], var, run, init, physics, forcing, dic.base_path_example)
-                    
-    
+                    merged_file = merge_time_axis(model['model_name'], var, run, init_scheme, p, forcing_scheme, dic.base_path_example)
 
+                    # Check that the merged file exists
+                    if merged_file is None:
+                        print("Error, merged file does not exist")
+                        return None
 
+                    # Now regrid the file
+                    # using the regrid function
+                    regridded_file = regrid(model['model_name'], var, run, init_scheme, p, forcing_scheme, region)
+
+                    # Check that the regridded file exists
+                    if regridded_file is None:
+                        print("Error, regridded file does not exist")
+                        return None
             else:
-                init_schemes = [int(init_schemes)]
+                # Set up the physics scheme
+                physics_scheme = [int(physics_schemes)]
+
+                # Set up the forcing scheme
+                forcing_scheme = [int(model['forcing_scheme'])]
+
+                # Merge the time axis of the files
+                # using the merge_time_axis function
+                merged_file = merge_time_axis(model['model_name'], var, run, init_scheme, physics_scheme, forcing_scheme, dic.base_path_example)
+
+                # Check that the merged file exists
+                if merged_file is None:
+                    print("Error, merged file does not exist")
+                    return None
                 
+                # Now regrid the file
+                # using the regrid function
+                regridded_file = regrid(model['model_name'], var, run, init_scheme, physics_scheme, forcing_scheme, region)
+
+                # Check that the regridded file exists
+                if regridded_file is None:
+                    print("Error, regridded file does not exist")
+                    return None
+
+
             
 
 
