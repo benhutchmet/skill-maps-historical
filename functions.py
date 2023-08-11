@@ -528,7 +528,7 @@ def calculate_annual_mean_anomalies(historical_data, model, member, season):
 # the model name and the member index
 # and the forecast range - e.g years 2-9
 
-def calculate_running_mean(historical_data, model, member, season, forecast_range):
+def calculate_running_mean(historical_data, model, member, forecast_range):
     """
     Calculates the running mean for the historical data.
     """
@@ -585,6 +585,78 @@ def calculate_running_mean(historical_data, model, member, season, forecast_rang
         except e as err:
             print("Error, failed to calculate rolling mean and drop Nans: ", err)
             return None
+
+
+# Now we want to define a function which will loop over the models and members
+# to calculate the annual mean anomalies where the rolling mean has been taken
+# this function takes as arguments: the historical data dictionary
+# which contains the data for the selected years and season
+# the season and forecast range
+def process_historical_data(historical_data, season, forecast_range, start_year, end_year):
+    """
+    Loops over the models and members to calculate the annual mean anomalies where the rolling mean has been taken.
+    """
+
+    # Initialize the dictionary
+    historical_data_processed = {}
+
+    # Loop over the models
+    # these are define by the model_name key in the dictionary
+    for model in historical_data:
+        # Print the model name
+        print("processing model: ", model)
+
+        # Initialize the member dictionary
+        member_dict = {}
+
+        # Loop over the members
+        # these are defined by the member index key in the dictionary
+        for member in historical_data[model]:
+
+            # Print the member index
+            print("processing member: ", member)
+
+            # Constrain the data to the given year and season
+            data = constrain_historical_data_season(historical_data, start_year, end_year, season, model, member)
+
+            # Check that the data is not empty
+            if data is None:
+                print("Error, data is empty")
+                return None
+            
+            # Calculate the anomalies
+            data = calculate_historical_anomalies_season(historical_data, model, member)
+
+            # Check that the data is not empty
+            if data is None:
+                print("Error, data is empty")
+                return None
+
+            # Calculate the annual mean anomalies
+            data = calculate_annual_mean_anomalies(historical_data, model, member, season)
+
+            # Check that the data is not empty
+            if data is None:
+                print("Error, data is empty")
+                return None
+
+            # Calculate the running mean
+            data = calculate_running_mean(historical_data, model, member, forecast_range)
+
+            # Check that the data is not empty
+            if data is None:
+                print("Error, data is empty")
+                return None
+
+            # Add the data to the member dictionary
+            member_dict[member] = data
+
+        # Add the member dictionary to the historical data dictionary
+        historical_data_processed[model] = member_dict
+
+    # Return the historical data dictionary
+    return historical_data_processed
+
 
 
 
