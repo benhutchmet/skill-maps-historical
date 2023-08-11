@@ -191,3 +191,6 @@ def regrid(model, var, run, init, physics, forcing, region):
             print("Error, failed to use cdo remapbil: ", err)
             return None
             
+# Now we want to write a function which will call the mergetime and regrid functions
+# for each given model, run, init, physics and forcing combination
+#
