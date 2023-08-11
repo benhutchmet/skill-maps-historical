@@ -657,6 +657,179 @@ def process_historical_data(historical_data, season, forecast_range, start_year,
     # Return the historical data dictionary
     return historical_data_processed
 
+# Define a function which will ensure that all of the members
+# for all of the models have the same number of years
+# this function takes as arguments: the historical data dictionary
+# which contains the data for the selected years and season
+def constrain_years(historical_data):
+    """
+    Ensures that all of the members for all of the models have the same number of years.
+    """
+
+    # Initialize a list to store the years for each model
+    years_list = []
+
+    # Loop over the models
+    # these are define by the model_name key in the dictionary
+    for model in historical_data:
+        # extract the model data
+        model_data = historical_data[model]
+
+        # Loop over the members in the model data
+        for member in model_data:
+            # extract the member data
+            member_data = model_data[member]
+
+            # extract the years from the member data
+            years = member_data.time.dt.year.values
+
+            # append the years to the years list
+            years_list.append(years)
+
+    # Check that the years list is not empty
+    if len(years_list) == 0:
+        print("Error, years list is empty")
+        return None
+    
+    # Find the years that are common to all of the members
+    common_years = set.intersection(*map(set, years_list))
+
+    # Initialize the dictionary for the constrained year data
+    historical_data_constrained = {}
+
+    # Loop over the models
+    # these are define by the model_name key in the dictionary
+    for model in historical_data:
+        # Extract the model data
+        model_data = historical_data[model]
+
+        # Loop over the members in the model data
+        for member in model_data:
+            # Extract the member data
+            member_data = model_data[member]
+
+            # Extract the years from the member data
+            years = member_data.time.dt.year.values
+
+            # Find the years which are common in the member data
+            # and the common years
+            years_shared = np.intersect1d(years, list(common_years))
+
+            # Constrain the data to the common years
+            member_data = member_data.sel(time=member_data.time.dt.year.isin(years_shared))
+
+            # Add the data to the member dictionary
+            if model not in historical_data_constrained:
+                historical_data_constrained[model] = {}
+
+            historical_data_constrained[model][member] = member_data
+
+    # Return the historical data dictionary
+    return historical_data_constrained
+    
+# Define a function which processes the historical data in preperation for calculating 
+# the spatial correlations
+# this function takes as arguments: the historical data dictionary
+def process_historical_data_spatial_correlations(historical_data):
+    """
+    Processes the historical data in preperation for calculating the spatial correlations.
+    """
+
+    # Initialize a list for the ensemble members
+    ensemble_members = []
+
+    # Initialize a dictionary to store the number of ensemble members for each model
+    ensemble_members_count = {}
+
+    # Constrain the years for each model
+    historical_data = constrain_years(historical_data)
+
+    # Loop over the models
+    for model in historical_data:
+        # Extract the model data
+        model_data = historical_data[model]
+
+        # Extract the ensemble members for this model
+        members = list(model_data.keys())
+
+        # Add the members to the ensemble members list
+        ensemble_members += members
+
+        # Add the number of members to the ensemble members count dictionary
+        ensemble_members_count[model] = len(members)
+
+        # Loop over the ensemble members in the model data
+        for member in model_data:
+            # Extract the member data
+            member_data = model_data[member]
+
+            # Append the data to the ensemble members list
+            ensemble_members.append(member_data)
+
+            # Extract the lat and lon values
+            lat = member_data.lat.values
+            lon = member_data.lon.values
+
+            # Check that the lat and lon values are not empty
+            if len(lat) == 0:
+                print("Error, lat values are empty")
+                return None
+            
+            if len(lon) == 0:
+                print("Error, lon values are empty")
+                return None
+            
+            # Check that the lat and lon values are the same
+            # for all ensemble members
+            if not np.array_equal(lat, ensemble_members[0].lat.values):
+                print("Error, lat values are not the same for all ensemble members")
+                return None
+            
+            if not np.array_equal(lon, ensemble_members[0].lon.values):
+                print("Error, lon values are not the same for all ensemble members")
+                return None
+            
+            # extract the year values
+            years = member_data.time.dt.year.values
+
+            # Check that the years are not empty
+            if len(years) == 0:
+                print("Error, years are empty")
+                return None
+            
+            # Check that the years are the same for all ensemble members
+            if not np.array_equal(years, ensemble_members[0].time.dt.year.values):
+                print("Error, years are not the same for all ensemble members")
+                return None
+            
+            # Check that the ensemble members are not empty
+            if len(ensemble_members) == 0:
+                print("Error, ensemble members are empty")
+                return None
+            
+    # convert the ensemble members list to a numpy array
+    ensemble_members = np.array(ensemble_members)
+
+    # take the equal weighted mean over the ensemble members
+    ensemble_mean = ensemble_members.mean(axis=0)
+
+    # Check that the ensemble mean is not empty
+    if len(ensemble_mean) == 0:
+        print("Error, ensemble mean is empty")
+        return None
+    
+    # Check that the ensemble mean is not NaN
+    if ensemble_mean.isnull().all():
+        print("Error, ensemble mean contains only NaN values")
+        return None
+    
+    # Convert ensemble mean to an xarray dataset
+    ensemble_mean = xr.DataArray(ensemble_mean, coords=member_data.coords, dims=member_data.dims)
+
+    # Return the ensemble mean
+    return ensemble_mean
+
+
 
 
 
