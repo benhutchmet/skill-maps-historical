@@ -184,3 +184,13 @@ season_months = {
     "DJFM": [12, 1, 2, 3]
 }
 
+season_timeshift = [
+    {'season': 'DJF', 'timeshift': -2},
+    {'season': 'NDJF', 'timeshift': -2},
+    {'season': 'DJFM', 'timeshift': -3},
+    {'season': 'NDJFM', 'timeshift': -3},
+    {'season': 'NDJ', 'timeshift': -1},
+    {'season': 'ONDJ', 'timeshift': -1},
+]
+
+

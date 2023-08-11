@@ -460,5 +460,131 @@ def calculate_historical_anomalies_season(historical_data, model, member):
     except e as err:
         print("Error, failed to calculate anomalies: ", err)
         return None
+    
+# Define a new function to calculate the annual mean anomalies
+# From the monthly anomalies
+# this function takes as arguments: the historical data dictionary
+# which contains the data for the selected years and season
+# the model name and the member index
+def calculate_annual_mean_anomalies(historical_data, model, member, season):
+    """
+    Calculates the annual mean anomalies for the historical data.
+    """
+
+    # Extract the data for this model and member
+    data = historical_data[model][member]
+
+    # Verify that the data is an xarray dataset
+    if not isinstance(data, xr.Dataset):
+        print("Error, data is not an xarray dataset")
+        return None
+    
+    # Check that the xarray dataset contains values other than NaN
+    if data.isnull().all():
+        print("Error, data contains only NaN values")
+        return None
+    
+    # Set up the season from the season_timeshift dictionary
+    season = dic.season_timeshift[season]
+
+    # If season is defined as 'season' within the dictionary
+    # then we shift the time axis by the 'timeshift' value
+    # and then calculate the annual mean
+    if season == 'season':
+
+        # print the timeshift value for this season
+        print("timeshift value for season: ", season['timeshift'])
+
+        try:
+
+            # Shift the time axis by the timeshift value
+            data = data.shift(time=season['timeshift'])
+
+            # Calculate the annual mean
+            data = data.resample(time='Y').mean(dim='time')
+        
+        except e as err:
+            print("Error, failed to shift time axis: ", err)
+            return None
+        
+    else:
+        # If season is not defined as 'season' within the dictionary
+        # then we calculate the annual mean
+        try:
+            # Calculate the annual mean
+            data = data.resample(time='Y').mean(dim='time')
+
+        except e as err:
+            print("Error, failed to calculate annual mean: ", err)
+            return None
+        
+    # Return the annual mean anomalies
+    return data
+
+# We want to define a function which will calculate the running mean
+# of the annual mean anomalies
+# this function takes as arguments: the historical data dictionary
+# which contains the data for the selected years and season
+# the model name and the member index
+# and the forecast range - e.g years 2-9
+
+def calculate_running_mean(historical_data, model, member, season, forecast_range):
+    """
+    Calculates the running mean for the historical data.
+    """
+
+    # Extract the data for this model and member
+    data = historical_data[model][member]
+
+    # Verify that the data is an xarray dataset
+    if not isinstance(data, xr.Dataset):
+        print("Error, data is not an xarray dataset")
+        return None
+    
+    # Check that the xarray dataset contains values other than NaN
+    if data.isnull().all():
+        # Print a message to say that the data contains only NaN values
+        print("Error, data contains only NaN values")
+        return None
+    
+    # set up the start and end years
+    start_year = int(forecast_range.split('-')[0])
+    end_year = int(forecast_range.split('-')[1])
+
+    # Print the forecast range
+    print("forecast range: ", start_year, "-", end_year)
+
+    # Calculate the rolling mean value
+    rolling_mean_value = end_year - start_year + 1
+
+    # Print the rolling mean value
+    print("rolling mean value: ", rolling_mean_value)
+
+    # If the rolling mean value is 1, then we don't need to calculate the rolling mean
+    if rolling_mean_value == 1:
+        print("rolling mean value is 1, no need to calculate rolling mean")
+        return data
+    # If the rolling mean value is greater than 1, then we need to calculate the rolling mean
+    else:
+        try:
+            
+            # Calculate the rolling mean
+            data = data.rolling(time=rolling_mean_value, center=True).mean()
+
+            # Get rid of the data for the years which are now NaN
+            data = data.dropna(dim='time', how='all')
+
+            # Verify that the data is not empty
+            if data.sizes['time'] == 0:
+                print("Error, data is empty")
+                return None
+
+            # Return the data
+            return data
+        
+        except e as err:
+            print("Error, failed to calculate rolling mean and drop Nans: ", err)
+            return None
+
 
 
