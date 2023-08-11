@@ -33,6 +33,10 @@ obs_tas = "/home/users/benhutch/ERA5/adaptor.mars.internal-1687448519.6842003-11
 obs_sfcWind = "/home/users/benhutch/ERA5/adaptor.mars.internal-1687448519.6842003-11056-8-3ea80a0a-4964-4995-bc42-7510a92e907b.nc"
 #
 
+gridspec_path = "/home/users/benhutch/gridspec"
+
+canari_base_path_historical = '/gws/nopw/j04/canari/users/benhutch/historical'
+
 obs_rsds="not/yet/implemented"
 
 obs = "/home/users/benhutch/ERA5/adaptor.mars.internal-1691509121.3261805-29348-4-3a487c76-fc7b-421f-b5be-7436e2eb78d7.nc"

@@ -23,6 +23,9 @@ from PIL import Image
 from cdo import *
 cdo = Cdo()
 
+# Import the dictionaries
+import dictionaries as dic
+
 # Write a function which uses CDO to merge the time axis of historical files
 # This function takes as arguments, the model name, the variable name, the initialization number, the run number
 # and the path to the directory containing the files
@@ -98,15 +101,93 @@ def merge_time_axis(model, var, run, init, physics, forcing, base_path):
 
         # use a try except block to catch errors
         try:
-            # Now merge the files
-            # Using cdo mergetime
-            cdo.mergetime(input=dir_path + '*.nc', output=output_file)
 
-            # Print a message to say that the files have been merged
-            print("Files merged successfully")
+            # if the output file already exists, don't do anything
+            if os.path.exists(output_file):
+                print("Output file already exists")
+                return output_file
+            else:
+                print("Output file does not exist")
+        
+                # Now merge the files
+                # Using cdo mergetime
+                cdo.mergetime(input=dir_path + '*.nc', output=output_file)
+
+                # Print a message to say that the files have been merged
+                print("Files merged successfully")
+
+                # Return the output file
+                return output_file
+        except e as err:
+            print("Error, failed to use cdo mergetime: ", err)
+            return None
+
+
+# Define a function which will regrid the data according to the parameters of a gridspec file
+# This function will takes as arguments: the model, the variable, the run, the initialization number, the physics number, 
+# the forcing number, the merged file path and the region
+def regrid(model, var, run, init, physics, forcing, region):
+    """
+    Function to regrid the data according to the parameters of a gridspec file.
+    """
+    
+    # set up the gridspec path
+    gridspec_path  = dic.gridspec_path
+
+    # Now set up the gridspec file to be used based on the region provided
+    gridspec_file = gridspec_path + '/' + 'gridspec' + '-' + region + '.txt'
+
+    # Check that the gridspec file exists
+    if not os.path.exists(gridspec_file):
+        print("Error, gridspec file does not exist for region: ", region)
+        return None
+    
+    # Now set up the output directory in canari
+    output_dir = dic.canari_base_path_historical + '/' + var + '/' + model + '/regrid'
+
+    # If the output directory doesn't exist, create it
+    if not os.path.exists(output_dir):
+        os.makedirs(output_dir)
+
+    # Now find the merged file which matches the r, i, p, f specifications
+    # construct the directory first
+    merged_dir = dic.canari_base_path_historical + '/' + var + '/' + model + '/mergetime'
+
+    # Now construct the merged file name
+    merged_filename = var + '_' + 'Amon' + '_' + model + '_' + 'historical' + '_' + 'r' + str(run) + 'i' + str(init) + 'p' + str(physics) + 'f' + str(forcing) + '_' + 'g?' + '_*.nc'
+
+    # Now construct the merged file path
+    merged_file = merged_dir + '/' + merged_filename
+
+    # Check that the merged file exists
+    if not os.path.exists(merged_file):
+        print("Error, merged file does not exist: ", merged_file)
+        return None
+    
+    # Now construct the output file name
+    # from the base name of the merged file
+    output_filename = merged_filename.split('.')[0] + '_' + region + '_regrid.nc'
+    # Now construct the output file path
+    output_file = output_dir + '/' + output_filename
+
+    # if the output file already exists, don't do anything
+    if os.path.exists(output_file):
+        print("Output file already exists")
+        return output_file
+    else:
+        print("Output file does not exist")
+        
+        try:
+            # Now regrid the file
+            # Using cdo remapbil
+            cdo.remapbil(gridspec_file, input=merged_file, output=output_file)
+
+            # Print a message to say that the files have been regridded
+            print("Files regridded successfully")
 
             # Return the output file
             return output_file
         except e as err:
-            print("Error, failed to use cdo mergetime: ", err)
+            print("Error, failed to use cdo remapbil: ", err)
             return None
+            
