@@ -38,7 +38,7 @@ base_path_example = "/badc/cmip6/data/CMIP6/CMIP"
 
 gridspec_path = "/home/users/benhutch/gridspec"
 
-canari_base_path_historical = '/gws/nopw/j04/canari/users/benhutch/historical'
+canari_base_path_historical = "/gws/nopw/j04/canari/users/benhutch/historical"
 
 obs_rsds="not/yet/implemented"
 

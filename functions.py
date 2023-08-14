@@ -403,11 +403,25 @@ def load_historical_data(model_dict, var, region):
         # Initialize the member dictionary
         member_dict = {}
 
+        # Set up the base dir
+        # base_dir = str(dic.canari_base_path_historical)
+
+        # set up the model
+        model = model['model_name']
+
+        # print the types of all of the variables
+        # to find out which is dict
+        print("type of var", type(var))
+        print("type of model", type(model))
+        print("type of region", type(region))
+        
         # Set up the directory path
         # Where all of the members (each unique r?i?p?f? combination) are stored
         # We want the regridded files
-        regrid_files = dic.canari_base_path_historical + '/' + var + '/' + model + '/regrid' + '/' + var + '_' + 'Amon' + '_' + model + '_' + 'historical' + '_' + 'r?i?p?f?' + '_' + region + '_regrid.nc'
+        regrid_files = dic.canari_base_path_historical + '/' + var + '/' + model + '/regrid' + '/' + var + '_' + 'Amon' + '_' + model + '_' + 'historical' + '_' + 'r*i?p?f?' + '_*' + region + '_regrid.nc'
 
+        print("regrid_files:", regrid_files)
+        
         # Check that the regrid files exist
         if len(glob.glob(regrid_files)) == 0:
             print("Error, regrid files do not exist")
@@ -417,7 +431,7 @@ def load_historical_data(model_dict, var, region):
         num_files = len(glob.glob(regrid_files))
 
         # Print the number of files
-        print("number of files for model ", model['model_name'], ": ", num_files)
+        print("number of files for model ", model, ": ", num_files)
 
         # Set up the member counter
         member = 0
@@ -431,14 +445,30 @@ def load_historical_data(model_dict, var, region):
             # Load the data for this member
             data = xr.open_dataset(file, chunks={'time': 50})
 
+            # look at the data
+            # print("data:", data)
+
+            # Print the type of the data
+            print("type of data", type(data))
+
+            # Check if the data is full of NaNs
+            if np.isnan(data[var]).all():
+                print("Error, data is full of NaNs")
+                return None
+
             # Add this data to the member dictionary
             member_dict[member] = data
 
             # Increment the member counter
             member += 1
 
+        # print the value of member_dict
+        print("member_dict:", member_dict)
+        print("type of member_dict", type(member_dict))
+        print("len of member_dict", len(member_dict))
+
         # Add the member dictionary to the historical data dictionary
-        historical_data[model['model_name']] = member_dict
+        historical_data[model] = member_dict
 
     # Return the historical data dictionary
     return historical_data
