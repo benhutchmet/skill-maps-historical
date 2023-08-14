@@ -56,6 +56,11 @@ def merge_time_axis(model, var, run, init, physics, forcing, base_path):
         # find the path to the file which has been copied
         copied_file = glob.glob(output_dir + '/*.nc')
 
+        # print a message to say that the file has been copied
+        # and print the path to the copied file
+        print("File copied successfully")
+        print("copied_file: ", copied_file)
+
         return copied_file
     # If there are multiple files, merge them
     else:
@@ -314,12 +319,22 @@ def call_mergetime_regrid(model_dict, var, region):
                 # Set up the forcing scheme
                 forcing_scheme = int(model['forcing_scheme'])
 
+                # Print the physics scheme being processed
+                print("processing physics scheme: ", physics_scheme)
+
+                # Print the forcing scheme being processed
+                print("processing forcing scheme: ", forcing_scheme)
+
                 # Merge the time axis of the files
                 # using the merge_time_axis function
                 merged_file = merge_time_axis(model['model_name'], var, run, init_scheme, physics_scheme, forcing_scheme, dic.base_path_example)
 
+                # print the merged_file
+                print("type of merged file", type(merged_file))
+                print("merged_file", merged_file)
+
                 # Check that the merged file exists
-                if merged_file is None:
+                if merged_file is None or not os.path.exists(merged_file[0]):
                     print("Error, merged file does not exist")
                     return None
                 
@@ -327,8 +342,12 @@ def call_mergetime_regrid(model_dict, var, region):
                 # using the regrid function
                 regridded_file = regrid(model['model_name'], var, run, init_scheme, physics_scheme, forcing_scheme, region)
 
+                # Print the type of the regridded file
+                print("type of regridded file", type(regridded_file))
+                print("regridded_file", regridded_file)
+
                 # Check that the regridded file exists
-                if regridded_file is None:
+                if regridded_file is None or not os.path.exists(regridded_file[0]):
                     print("Error, regridded file does not exist")
                     return None
 
