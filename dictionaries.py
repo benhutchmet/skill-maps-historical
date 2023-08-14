@@ -33,6 +33,9 @@ obs_tas = "/home/users/benhutch/ERA5/adaptor.mars.internal-1687448519.6842003-11
 obs_sfcWind = "/home/users/benhutch/ERA5/adaptor.mars.internal-1687448519.6842003-11056-8-3ea80a0a-4964-4995-bc42-7510a92e907b.nc"
 #
 
+# set up the base path example for the historical runs
+base_path_example = "/badc/cmip6/data/CMIP6/CMIP"
+
 gridspec_path = "/home/users/benhutch/gridspec"
 
 canari_base_path_historical = '/gws/nopw/j04/canari/users/benhutch/historical'
