@@ -52,7 +52,11 @@ def merge_time_axis(model, var, run, init, physics, forcing, base_path):
     # If there is only one file in the directory, copy it to the output directory
     if len(glob.glob(dir_path + '*.nc')) == 1:
         os.system('cp ' + dir_path + '*.nc ' + output_dir + '/')
-        return
+
+        # find the path to the file which has been copied
+        copied_file = glob.glob(output_dir + '/*.nc')
+
+        return copied_file
     # If there are multiple files, merge them
     else:
         # find the directories which match the path
@@ -280,6 +284,10 @@ def call_mergetime_regrid(model_dict, var, region):
                     # using the merge_time_axis function
                     merged_file = merge_time_axis(model['model_name'], var, run, init_scheme, p, forcing_scheme, dic.base_path_example)
 
+                    # print the merged_file
+                    print("type of merged file", type(merged_file))
+                    print("merged_file", merged_file)
+                    
                     # Check that the merged file exists
                     if merged_file is None:
                         print("Error, merged file does not exist")
