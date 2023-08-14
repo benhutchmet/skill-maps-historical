@@ -72,16 +72,29 @@ def merge_time_axis(model, var, run, init, physics, forcing, base_path):
     # If there are multiple files, merge them
     else:
         # find the directories which match the path
-        dirs = glob.glob(dir_path)
+        dirs = glob.glob(dir_path + '*.nc')
 
         # Check that the list of directories is not empty
         if len(dirs) == 0:
             print("No files available")
             return None
         
-        # extract the filenames in the final directory
-        # after the last /
-        filenames = dirs.split('/')[-1]
+        # print the list of directories
+        print("dirs: ", dirs)
+        # print the length of the list of directories
+        print("len(dirs): ", len(dirs))
+        # print the type of the list of directories
+        print("type(dirs): ", type(dirs))
+
+        # if the length of the dirs is 1, then split the first element of the list
+        if len(dirs) == 1:
+            print("Only one directory found")
+            filenames = dirs[0].split('/')[-1]
+        else:
+            print("[WARNING] More than one directory found")
+            print("len(dirs): ", len(dirs))
+            # loop over the directories and split the last element of each directory
+            filenames = [dir.split('/')[-1] for dir in dirs]
 
         # Check that the list of filenames is not empty
         if len(filenames) == 0:
@@ -113,7 +126,7 @@ def merge_time_axis(model, var, run, init, physics, forcing, base_path):
         output_filename = var + '_' + 'Amon' + '_' + model + '_' + 'historical' + '_' + 'r' + str(run) + 'i' + str(init) + 'p' + str(physics) + 'f' + str(forcing) + '_' + 'g?' + '_' + str(min_year) + '-' + str(max_year) + '.nc'
 
         # construct the output path
-        output_file = output_dir + '/' + output_filename
+        output_file = os.path.join(output_dir, output_filename)
 
         # use a try except block to catch errors
         try:
@@ -185,9 +198,14 @@ def regrid(model, var, run, init, physics, forcing, region):
     print("type(merged_file): ", type(merged_file))
     print("merged_file: ", merged_file)
 
+    # if merged_file is an empty list then continue
+    if len(merged_file) == 0:
+        print("Error, merged file not found")
+        return None
+
     # Check that the merged file exists
     if not os.path.exists(merged_file[0]):
-        print("Error, merged file does not exist: ", merged_file[0])
+        print("Error, merged file does not exist regrid: ", merged_file[0])
         return None
 
     print("merged_file[0]: ", merged_file[0])
@@ -311,7 +329,7 @@ def call_mergetime_regrid(model_dict, var, region):
                         print("Error, forcing schemes are not a single number")
                         return None
                     else:
-                        forcing_scheme = [int(forcing_scheme)]
+                        forcing_scheme = int(forcing_scheme)
 
                     # Merge the time axis of the files
                     # using the merge_time_axis function
@@ -323,8 +341,7 @@ def call_mergetime_regrid(model_dict, var, region):
                     
                     # Check that the merged file exists
                     if merged_file is None:
-                        print("Error, merged file does not exist")
-                        return None
+                        print("Error, merged file does not exist in call_mergetime_regrid")
 
                     # Now regrid the file
                     # using the regrid function
@@ -333,7 +350,7 @@ def call_mergetime_regrid(model_dict, var, region):
                     # Check that the regridded file exists
                     if regridded_file is None:
                         print("Error, regridded file does not exist")
-                        return None
+                        
             else:
                 # Set up the physics scheme
                 physics_scheme = int(physics_schemes)
@@ -357,12 +374,12 @@ def call_mergetime_regrid(model_dict, var, region):
 
                 # Print the type of the regridded file
                 print("type of regridded file", type(regridded_file))
-                print("regridded_file", regridded_file[0])
+                # print("regridded_file", regridded_file[0])
 
-                # Check that the regridded file exists
-                if regridded_file[0] is None or not os.path.exists(regridded_file[0]):
+                # if the type of the regridded file is none
+                # then echo an error and exit
+                if regridded_file is None:
                     print("Error, regridded file does not exist")
-                    return None
 
 
 # Now we want to define a function to load the historical data
