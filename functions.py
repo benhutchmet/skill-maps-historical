@@ -495,6 +495,9 @@ def constrain_historical_data_season(historical_data, start_year, end_year, seas
     # Extract the data for this model and member
     data = historical_data[model][member]
 
+    # print the type of dat
+    print("type of data in constrain historical data season", type(data))
+
     # Verify that the data is an xarray dataset
     if not isinstance(data, xr.Dataset):
         print("Error, data is not an xarray dataset")
@@ -725,15 +728,18 @@ def process_historical_data(historical_data, season, forecast_range, start_year,
 
             # Check that the data is not empty
             if data is None:
-                print("Error, data is empty")
+                print("Error, data is empty post year and season constraint")
                 return None
             
+            # Check that this data exists by printing the data
+            print("data: ", historical_data[model][member])
+
             # Calculate the anomalies
             data = calculate_historical_anomalies_season(historical_data, model, member)
 
             # Check that the data is not empty
             if data is None:
-                print("Error, data is empty")
+                print("Error, data is empty post anoms")
                 return None
 
             # Calculate the annual mean anomalies
