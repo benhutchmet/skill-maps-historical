@@ -247,6 +247,9 @@ def call_mergetime_regrid(model_dict, var, region):
                 print("Error, init schemes are not a single number")
                 return None
             
+            # Print the init scheme being processed
+            print("processing init scheme: ", init_scheme)
+            
             # Extract the physics schemes for this model
             physics_schemes = model['physics_scheme']
             
@@ -265,6 +268,9 @@ def call_mergetime_regrid(model_dict, var, region):
 
                 # Loop over the init schemes
                 for p in physics_schemes:
+
+                    # Print the physics scheme being processed
+                    print("processing physics scheme: ", p)
 
                     # Extract the forcing schemes for this model
                     forcing_scheme = model['forcing_scheme']
@@ -303,10 +309,10 @@ def call_mergetime_regrid(model_dict, var, region):
                         return None
             else:
                 # Set up the physics scheme
-                physics_scheme = [int(physics_schemes)]
+                physics_scheme = int(physics_schemes)
 
                 # Set up the forcing scheme
-                forcing_scheme = [int(model['forcing_scheme'])]
+                forcing_scheme = int(model['forcing_scheme'])
 
                 # Merge the time axis of the files
                 # using the merge_time_axis function
