@@ -175,6 +175,9 @@ def regrid(model, var, run, init, physics, forcing, region):
     # Now construct the merged file path
     merged_file = merged_dir + '/' + merged_filename
 
+    # Print a message to say that the merged file is being searched for
+    print("Searching for merged file: ", merged_file)
+
     # Check that the merged file exists
     if not os.path.exists(merged_file):
         print("Error, merged file does not exist: ", merged_file)
@@ -335,16 +338,6 @@ def call_mergetime_regrid(model_dict, var, region):
                 # Merge the time axis of the files
                 # using the merge_time_axis function
                 copied_file = merge_time_axis(model['model_name'], var, run, init_scheme, physics_scheme, forcing_scheme, dic.base_path_example)
-
-                # print the merged_file
-                print("type of merged file", type(copied_file))
-                print("merged_file", copied_file)
-
-                # Check that the merged file exists
-                if not copied_file:
-                    print("Error, merged file does not exist")
-                    print("copied_file", copied_file)
-                    return None
                 
                 # Now regrid the file
                 # using the regrid function
