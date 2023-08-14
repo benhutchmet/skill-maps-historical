@@ -51,10 +51,17 @@ def merge_time_axis(model, var, run, init, physics, forcing, base_path):
 
     # If there is only one file in the directory, copy it to the output directory
     if len(glob.glob(dir_path + '*.nc')) == 1:
+        # print a message to say that there is only one file
+        print("Only one file available")
+        
+        # copy the file to the output directory
         os.system('cp ' + dir_path + '*.nc ' + output_dir + '/')
 
         # find the path to the file which has been copied
         copied_file = glob.glob(output_dir + '/*.nc')
+
+        # find the full path and filename of the copied file
+        copied_file = copied_file[0]
 
         # print a message to say that the file has been copied
         # and print the path to the copied file
@@ -327,28 +334,16 @@ def call_mergetime_regrid(model_dict, var, region):
 
                 # Merge the time axis of the files
                 # using the merge_time_axis function
-                merged_file = merge_time_axis(model['model_name'], var, run, init_scheme, physics_scheme, forcing_scheme, dic.base_path_example)
+                copied_file = merge_time_axis(model['model_name'], var, run, init_scheme, physics_scheme, forcing_scheme, dic.base_path_example)
 
                 # print the merged_file
-                print("type of merged file", type(merged_file))
-                print("merged_file", merged_file[0])
+                print("type of merged file", type(copied_file))
+                print("merged_file", copied_file)
 
-                # form the merged file path
-                path = "/gws/nopw/j04/canari/users/benhutch/historical/" + var + "/" + model['model_name'] + "/mergetime"
-
-                # form the merged file name using wildcards
-                merged_file_name = var + "_*" + model['model_name'] + "*_r" + str(run) + "i" + str(init_scheme) + "p" + str(physics_scheme) + "f" + str(forcing_scheme) + "*.nc"
-
-                # form the merged file path
-                merged_file_path = os.path.join(path, merged_file_name)
-
-                # print the merged_file_path
-                print("merged_file_path", merged_file_path)
-                print("type of merged_file_path", type(merged_file_path))
-
-                # Check that the merged file path exists
-                if merged_file_path is None or not os.path.exists(merged_file_path):
+                # Check that the merged file exists
+                if not copied_file:
                     print("Error, merged file does not exist")
+                    print("copied_file", copied_file)
                     return None
                 
                 # Now regrid the file
