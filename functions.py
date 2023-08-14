@@ -173,19 +173,31 @@ def regrid(model, var, run, init, physics, forcing, region):
     merged_filename = var + '_' + 'Amon' + '_' + model + '_' + 'historical' + '_' + 'r' + str(run) + 'i' + str(init) + 'p' + str(physics) + 'f' + str(forcing) + '_' + 'g?' + '_*.nc'
 
     # Now construct the merged file path
-    merged_file = merged_dir + '/' + merged_filename
+    merged_file = os.path.join(merged_dir, merged_filename)
 
     # Print a message to say that the merged file is being searched for
     print("Searching for merged file: ", merged_file)
 
+    # use glob to find the merged file
+    merged_file = glob.glob(merged_file)
+
+    # Print the type and value of the merged file from glob
+    print("type(merged_file): ", type(merged_file))
+    print("merged_file: ", merged_file)
+
     # Check that the merged file exists
-    if not os.path.exists(merged_file):
-        print("Error, merged file does not exist: ", merged_file)
+    if not os.path.exists(merged_file[0]):
+        print("Error, merged file does not exist: ", merged_file[0])
         return None
+
+    print("merged_file[0]: ", merged_file[0])
+
+    # Set up the merged file name
+    merged_filename = merged_file[0].split('/')[-1]
     
     # Now construct the output file name
     # from the base name of the merged file
-    output_filename = merged_filename.split('.')[0] + '_' + region + '_regrid.nc'
+    output_filename = merged_filename + '_' + region + '_regrid.nc'
     # Now construct the output file path
     output_file = output_dir + '/' + output_filename
 
