@@ -449,7 +449,7 @@ def load_historical_data(model_dict, var, region):
             # print("data:", data)
 
             # Print the type of the data
-            print("type of data", type(data))
+            #print("type of data", type(data))
 
             # Check if the data is full of NaNs
             if np.isnan(data[var]).all():
@@ -463,12 +463,23 @@ def load_historical_data(model_dict, var, region):
             member += 1
 
         # print the value of member_dict
-        print("member_dict:", member_dict)
+        # print("member_dict:", member_dict)
         print("type of member_dict", type(member_dict))
         print("len of member_dict", len(member_dict))
 
+        # print the value of model
+        print("model:", model)
+        print("type of model", type(model))
+        print("len of model", len(model))
+
         # Add the member dictionary to the historical data dictionary
         historical_data[model] = member_dict
+
+    # Print the historical data dictionary
+    # print("historical_data:", historical_data)
+    print("type of historical_data", type(historical_data))
+    print("shape of historical_data", np.shape(historical_data))
+
 
     # Return the historical data dictionary
     return historical_data
