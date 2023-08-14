@@ -331,10 +331,23 @@ def call_mergetime_regrid(model_dict, var, region):
 
                 # print the merged_file
                 print("type of merged file", type(merged_file))
-                print("merged_file", merged_file)
+                print("merged_file", merged_file[0])
 
-                # Check that the merged file exists
-                if merged_file is None or not os.path.exists(merged_file[0]):
+                # form the merged file path
+                path = "/gws/nopw/j04/canari/users/benhutch/historical/" + var + "/" + model['model_name'] + "/mergetime"
+
+                # form the merged file name using wildcards
+                merged_file_name = var + "_*" + model['model_name'] + "*_r" + str(run) + "i" + str(init_scheme) + "p" + str(physics_scheme) + "f" + str(forcing_scheme) + "*.nc"
+
+                # form the merged file path
+                merged_file_path = os.path.join(path, merged_file_name)
+
+                # print the merged_file_path
+                print("merged_file_path", merged_file_path)
+                print("type of merged_file_path", type(merged_file_path))
+
+                # Check that the merged file path exists
+                if merged_file_path is None or not os.path.exists(merged_file_path):
                     print("Error, merged file does not exist")
                     return None
                 
@@ -344,10 +357,10 @@ def call_mergetime_regrid(model_dict, var, region):
 
                 # Print the type of the regridded file
                 print("type of regridded file", type(regridded_file))
-                print("regridded_file", regridded_file)
+                print("regridded_file", regridded_file[0])
 
                 # Check that the regridded file exists
-                if regridded_file is None or not os.path.exists(regridded_file[0]):
+                if regridded_file[0] is None or not os.path.exists(regridded_file[0]):
                     print("Error, regridded file does not exist")
                     return None
 
