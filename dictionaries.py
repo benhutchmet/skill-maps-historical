@@ -137,7 +137,7 @@ model_dictionary_psl_historical_badc = [
     {'model_name': 'MPI-ESM1-2-LR', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
     {'model_name': 'FGOALS-f3-L', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
     {'model_name': 'MIROC6', 'runs': '1-50', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
-    {'model_name': 'IPSL-CM6A-LR', 'runs': '1-31', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'}
+    {'model_name': 'IPSL-CM6A-LR', 'runs': '1-31', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
     {'model_name': 'NorCPM1', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'}
 ]
 
@@ -153,7 +153,7 @@ model_dictionary_tas_historical_badc = [
     {'model_name': 'MPI-ESM1-2-LR', 'runs': '1-30', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
     {'model_name': 'FGOALS-f3-L', 'runs': '1-3', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
     {'model_name': 'MIROC6', 'runs': '1-50', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
-    {'model_name': 'IPSL-CM6A-LR', 'runs': '1-32', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'}
+    {'model_name': 'IPSL-CM6A-LR', 'runs': '1-32', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
     {'model_name': 'NorCPM1', 'runs': '30', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'}
 ]
 
@@ -169,7 +169,7 @@ model_dictionary_rsds_historical_badc = [
     {'model_name': 'MPI-ESM1-2-LR', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
     {'model_name': 'FGOALS-f3-L', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
     {'model_name': 'MIROC6', 'runs': '1-10', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
-    {'model_name': 'IPSL-CM6A-LR', 'runs': '1-31', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'}
+    {'model_name': 'IPSL-CM6A-LR', 'runs': '1-31', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
     {'model_name': 'NorCPM1', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'}
 ]
 
