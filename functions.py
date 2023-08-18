@@ -527,7 +527,10 @@ def calculate_historical_anomalies_season(constrained_data, historical_data, mod
     print("member_data dimensions: ", member_data.dims)
 
     # find all of the members for this model
-    model_members = historical_data[model]
+    datasets = [historical_data[model][member] for member in historical_data[model]]
+
+    # Concatenate the datasets along the member axis into an ensemble
+    model_members_ensemble = xr.concat(datasets, dim='member')
 
     # Print the values of the data
     #print("data values: ", data.values)
@@ -547,17 +550,19 @@ def calculate_historical_anomalies_season(constrained_data, historical_data, mod
         # print that we are calculating the anomalies
         print("Calculating anomalies")
 
-        # Calculate the climatology from the time mean
-        # of all of the members for this model
-        data_climatology = model_members.mean(dim='member')
+        # Calculate ensemble mean along the member axis
+        model_members_ensemble_mean = model_members_ensemble.mean(dim='member')
+
+        # take the time mean of the ensemble mean
+        model_climatology = model_members_ensemble_mean.mean(dim='time')
         
         # print the data climatology
         # print("data_climatology: ", data_climatology)
         # print the shape of the data climatology
-        print("shape of data_climatology: ", np.shape(data_climatology))
+        print("dimensions of data_climatology: ", model_climatology.dims)
 
         # Calculate the anomalies
-        data_anomalies = member_data - data_climatology
+        data_anomalies = member_data - model_climatology
 
         # Return the anomalies
         return data_anomalies
