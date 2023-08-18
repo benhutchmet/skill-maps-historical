@@ -544,7 +544,7 @@ def calculate_historical_anomalies_season(constrained_data, historical_data, mod
     if member_data.isnull().all():
         print("Data is null when calculating anomalies")
         print("Error, data contains only NaN values")
-        return None
+        #return None
 
     try:
         # print that we are calculating the anomalies
@@ -575,13 +575,13 @@ def calculate_historical_anomalies_season(constrained_data, historical_data, mod
 # this function takes as arguments: the historical data dictionary
 # which contains the data for the selected years and season
 # the model name and the member index
-def calculate_annual_mean_anomalies(historical_data, model, member, season):
+def calculate_annual_mean_anomalies(constrained_data_anoms, season):
     """
     Calculates the annual mean anomalies for the historical data.
     """
 
     # Extract the data for this model and member
-    data = historical_data[model][member].psl
+    member_data = constrained_data_anoms.psl
 
     # Verify that the data is an xarray dataset
     # if not isinstance(data, xr.Dataset):
@@ -589,7 +589,7 @@ def calculate_annual_mean_anomalies(historical_data, model, member, season):
     #     return None
     
     # Check that the xarray dataset contains values other than NaN
-    if data.isnull().all():
+    if member_data.isnull().all():
         print("Error, data contains only NaN values")
         return None
     
@@ -597,14 +597,6 @@ def calculate_annual_mean_anomalies(historical_data, model, member, season):
     print("type of dic.season_timeshift: ", type(dic.season_timeshift))
     
     # Set up the season from the season_timeshift dictionary
-    #     season_timeshift = [
-    #     {'season': 'DJF', 'timeshift': -2},
-    #     {'season': 'NDJF', 'timeshift': -2},
-    #     {'season': 'DJFM', 'timeshift': -3},
-    #     {'season': 'NDJFM', 'timeshift': -3},
-    #     {'season': 'NDJ', 'timeshift': -1},
-    #     {'season': 'ONDJ', 'timeshift': -1},
-    # ]
     season_index = [d['season'] for d in dic.season_timeshift].index(season)
     season = dic.season_timeshift[season_index]['timeshift']
 
@@ -621,13 +613,15 @@ def calculate_annual_mean_anomalies(historical_data, model, member, season):
 
         try:
 
+            print("shifting time axis by timeshift value: ", season['timeshift'])
+
             # Shift the time axis by the timeshift value
-            data = data.shift(time=season['timeshift'])
+            member_data = member_data.shift(time=season['timeshift'])
 
             # Calculate the annual mean
-            data = data.resample(time='Y').mean(dim='time')
+            member_data = member_data.resample(time='Y').mean(dim='time')
         
-        except e as err:
+        except Exception as err:
             print("Error, failed to shift time axis: ", err)
             return None
         
@@ -636,14 +630,14 @@ def calculate_annual_mean_anomalies(historical_data, model, member, season):
         # then we calculate the annual mean
         try:
             # Calculate the annual mean
-            data = data.resample(time='Y').mean(dim='time')
+            member_data = member_data.resample(time='Y').mean(dim='time')
 
-        except e as err:
+        except Exception as err:
             print("Error, failed to calculate annual mean: ", err)
             return None
         
     # Return the annual mean anomalies
-    return data
+    return member_data
 
 # We want to define a function which will calculate the running mean
 # of the annual mean anomalies
@@ -652,13 +646,13 @@ def calculate_annual_mean_anomalies(historical_data, model, member, season):
 # the model name and the member index
 # and the forecast range - e.g years 2-9
 
-def calculate_running_mean(historical_data, model, member, forecast_range):
+def calculate_running_mean(constrained_data_anoms_annual, forecast_range):
     """
     Calculates the running mean for the historical data.
     """
 
     # Extract the data for this model and member
-    data = historical_data[model][member].psl
+    member_data = constrained_data_anoms_annual
 
     # Verify that the data is an xarray dataset
     # if not isinstance(data, xr.Dataset):
@@ -666,7 +660,7 @@ def calculate_running_mean(historical_data, model, member, forecast_range):
     #     return None
     
     # Check that the xarray dataset contains values other than NaN
-    if data.isnull().all():
+    if member_data.isnull().all():
         # Print a message to say that the data contains only NaN values
         print("Error, data contains only NaN values")
         return None
@@ -687,24 +681,24 @@ def calculate_running_mean(historical_data, model, member, forecast_range):
     # If the rolling mean value is 1, then we don't need to calculate the rolling mean
     if rolling_mean_value == 1:
         print("rolling mean value is 1, no need to calculate rolling mean")
-        return data
+        return member_data
     # If the rolling mean value is greater than 1, then we need to calculate the rolling mean
     else:
         try:
             
             # Calculate the rolling mean
-            data = data.rolling(time=rolling_mean_value, center=True).mean()
+            member_data = member_data.rolling(time=rolling_mean_value, center=True).mean()
 
             # Get rid of the data for the years which are now NaN
-            data = data.dropna(dim='time', how='all')
+            member_data = member_data.dropna(dim='time', how='all')
 
             # Verify that the data is not empty
-            if data.sizes['time'] == 0:
+            if member_data.sizes['time'] == 0:
                 print("Error, data is empty")
                 return None
 
             # Return the data
-            return data
+            return member_data
         
         except e as err:
             print("Error, failed to calculate rolling mean and drop Nans: ", err)
@@ -735,11 +729,12 @@ def process_historical_data(historical_data, season, forecast_range, start_year,
     # Initialize the dictionary
     historical_data_processed = {}
 
-    test_model = [ "BCC-CSM2-MR" ]
+    # Set up the test model case
+    # test_model = [ "BCC-CSM2-MR" ]
 
     # Loop over the models
     # these are define by the model_name key in the dictionary
-    for model in test_model:
+    for model in historical_data:
         # Print the model name
         print("processing model: ", model)
 
@@ -772,8 +767,11 @@ def process_historical_data(historical_data, season, forecast_range, start_year,
                 print("Error, data is empty post anoms")
                 return None
 
+            # print the values of the data
+            print("constraints_data_anoms values: ", constrained_data_anoms.psl.values)
+
             # Calculate the annual mean anomalies
-            constrained_data_anoms_annual = calculate_annual_mean_anomalies(constrained_data_anoms, model, member, season)
+            constrained_data_anoms_annual = calculate_annual_mean_anomalies(constrained_data_anoms, season)
 
             # Check that the data is not empty
             if constrained_data_anoms_annual is None:
@@ -781,7 +779,7 @@ def process_historical_data(historical_data, season, forecast_range, start_year,
                 return None
 
             # Calculate the running mean
-            constrained_data_anoms_annual_rm = calculate_running_mean(constrained_data_anoms_annual, model, member, forecast_range)
+            constrained_data_anoms_annual_rm = calculate_running_mean(constrained_data_anoms_annual, forecast_range)
 
             # Check that the data is not empty
             if constrained_data_anoms_annual_rm is None:
