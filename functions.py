@@ -524,7 +524,7 @@ def calculate_historical_anomalies_season(historical_data, model, member):
     data = historical_data[model][member].psl
 
     # Print the values of the data
-    print("data values: ", data.values)
+    #print("data values: ", data.values)
 
     # Verify that the data is an xarray dataset
     # if not isinstance(data, xr.Dataset):
@@ -543,6 +543,11 @@ def calculate_historical_anomalies_season(historical_data, model, member):
 
         # Calculate the mean over the time axis
         data_climatology = data.mean(dim='time')
+
+        # print the data climatology
+        print("data_climatology: ", data_climatology)
+        # print the shape of the data climatology
+        print("shape of data_climatology: ", np.shape(data_climatology))
 
         # Calculate the anomalies
         data_anomalies = data - data_climatology
