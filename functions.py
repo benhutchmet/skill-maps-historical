@@ -18,6 +18,9 @@ import scipy.stats as stats
 import matplotlib.animation as animation
 from matplotlib import rcParams
 from PIL import Image
+import multiprocessing
+import dask.array as da
+import dask.distributed as dd
 
 # Import CDO
 from cdo import *
@@ -757,7 +760,7 @@ def process_historical_data(historical_data, season, forecast_range, start_year,
                 return None
             
             # Check that this data exists by printing the dimensions
-            print("constrained_data dimensions: ", constrained_data.dims)
+            # print("constrained_data dimensions: ", constrained_data.dims)
 
             # Calculate the anomalies
             constrained_data_anoms = calculate_historical_anomalies_season(constrained_data, historical_data, model, member)
@@ -768,7 +771,7 @@ def process_historical_data(historical_data, season, forecast_range, start_year,
                 return None
 
             # print the values of the data
-            print("constraints_data_anoms values: ", constrained_data_anoms.psl.values)
+            # print("constraints_data_anoms values: ", constrained_data_anoms.psl.values)
 
             # Calculate the annual mean anomalies
             constrained_data_anoms_annual = calculate_annual_mean_anomalies(constrained_data_anoms, season)
@@ -788,6 +791,112 @@ def process_historical_data(historical_data, season, forecast_range, start_year,
 
             # Add the data to the member dictionary
             member_dict[member] = constrained_data_anoms_annual_rm
+
+        # Add the member dictionary to the historical data dictionary
+        historical_data_processed[model] = member_dict
+
+    # Return the historical data dictionary
+    return historical_data_processed
+
+
+# try to run this process in parallel for the members of each mode
+# to speed up the processing
+def process_member_data(model, member, historical_data, season, forecast_range, start_year, end_year):
+    """
+    Processes the data for a single member of a given model.
+    """
+    # Open the netCDF files using dask
+    file_pattern = historical_data[model][member]
+    ds = dd.open_mfdataset(file_pattern, chunks={'time': 'auto'})
+
+    # Constrain the data to the given year and season
+    constrained_data = ds.sel(time=slice(f'{start_year}-{season}', f'{end_year}-{season}'))
+
+    # Check that the data is not empty
+    if constrained_data.time.size == 0:
+        print("Error, data is empty post year and season constraint")
+        return None
+
+    # Calculate the anomalies
+    climatology = constrained_data.groupby('time.dayofyear').mean('time')
+    anomalies = constrained_data.groupby('time.dayofyear') - climatology
+
+    # Check that the data is not empty
+    if anomalies.time.size == 0:
+        print("Error, data is empty post anoms")
+        return None
+
+    # Calculate the annual mean anomalies
+    annual_mean_anomalies = anomalies.resample(time='AS').mean('time')
+
+    # Check that the data is not empty
+    if annual_mean_anomalies.time.size == 0:
+        print("Error, data is empty post annual mean")
+        return None
+
+    # Calculate the running mean
+    running_mean = annual_mean_anomalies.rolling(time=forecast_range, center=True).mean()
+
+    # Check that the data is not empty
+    if running_mean.time.size == 0:
+        print("Error, data is empty post running mean")
+        return None
+
+    # Compute the running mean and return the processed data
+    return (model, member, running_mean.compute())
+
+
+# dask version
+def process_historical_data_parallel(historical_data, season, forecast_range, start_year, end_year):
+    """
+    Loops over the models and members to calculate the annual mean anomalies where the rolling mean has been taken.
+    Processes the members for each model in parallel using dask.
+
+    Arguments:
+    historical_data -- the historical data dictionary
+    season -- the season
+    forecast_range -- the forecast range
+    start_year -- the start year
+    end_year -- the end year
+
+    Returns:
+    historical_data_processed -- the processed historical data dictionary
+
+    """
+
+    # Initialize the dictionary
+    historical_data_processed = {}
+
+    # Loop over the models
+    # these are define by the model_name key in the dictionary
+    for model in historical_data:
+        # Print the model name
+        print("processing model: ", model)
+
+        # Initialize the member dictionary
+        member_dict = {}
+
+        # Get the list of members for this model
+        members = list(historical_data[model].keys())
+
+        # Create a distributed computing cluster
+        client = dd.Client()
+
+        # Process the members in parallel using dask
+        futures = []
+        for member in members:
+            future = client.submit(process_member_data, model, member, historical_data, season, forecast_range, start_year, end_year)
+            futures.append(future)
+
+        # Get the results from the worker processes
+        processed_data = client.gather(futures)
+
+        # Close the distributed computing cluster
+        client.close()
+
+        # Add the processed data to the member dictionary
+        for model_name, member_name, member_data in processed_data:
+            member_dict[member_name] = member_data
 
         # Add the member dictionary to the historical data dictionary
         historical_data_processed[model] = member_dict
