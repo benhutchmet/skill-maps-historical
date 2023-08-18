@@ -723,9 +723,11 @@ def process_historical_data(historical_data, season, forecast_range, start_year,
     # Initialize the dictionary
     historical_data_processed = {}
 
+    test_model = [ "BCC-CSM2-MR" ]
+
     # Loop over the models
     # these are define by the model_name key in the dictionary
-    for model in historical_data:
+    for model in test_model:
         # Print the model name
         print("processing model: ", model)
 
@@ -740,42 +742,42 @@ def process_historical_data(historical_data, season, forecast_range, start_year,
             print("processing member: ", member)
 
             # Constrain the data to the given year and season
-            data = constrain_historical_data_season(historical_data, start_year, end_year, season, model, member)
+            constrained_data = constrain_historical_data_season(historical_data, start_year, end_year, season, model, member)
 
             # Check that the data is not empty
-            if data is None:
+            if constrained_data is None:
                 print("Error, data is empty post year and season constraint")
                 return None
             
-            # Check that this data exists by printing the data
-            print("data: ", historical_data[model][member])
+            # Check that this data exists by printing the dimensions
+            print("constrained_data dimensions: ", constrained_data.dims)
 
             # Calculate the anomalies
-            data = calculate_historical_anomalies_season(historical_data, model, member)
+            constrained_data_anoms = calculate_historical_anomalies_season(constrained_data, model, member)
 
             # Check that the data is not empty
-            if data is None:
+            if constrained_data_anoms is None:
                 print("Error, data is empty post anoms")
                 return None
 
             # Calculate the annual mean anomalies
-            data = calculate_annual_mean_anomalies(historical_data, model, member, season)
+            constrained_data_anoms_annual = calculate_annual_mean_anomalies(constrained_data_anoms, model, member, season)
 
             # Check that the data is not empty
-            if data is None:
+            if constrained_data_anoms_annual is None:
                 print("Error, data is empty post annual mean")
                 return None
 
             # Calculate the running mean
-            data = calculate_running_mean(historical_data, model, member, forecast_range)
+            constrained_data_anoms_annual_rm = calculate_running_mean(constrained_data_anoms_annual, model, member, forecast_range)
 
             # Check that the data is not empty
-            if data is None:
+            if constrained_data_anoms_annual_rm is None:
                 print("Error, data is empty post running mean")
                 return None
 
             # Add the data to the member dictionary
-            member_dict[member] = data
+            member_dict[member] = constrained_data_anoms_annual_rm
 
         # Add the member dictionary to the historical data dictionary
         historical_data_processed[model] = member_dict
