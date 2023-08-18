@@ -580,8 +580,19 @@ def calculate_annual_mean_anomalies(historical_data, model, member, season):
     print("type of dic.season_timeshift: ", type(dic.season_timeshift))
     
     # Set up the season from the season_timeshift dictionary
-    season_index = dic.season_names.index(season)
-    season = dic.season_timeshift[season_index]
+    #     season_timeshift = [
+    #     {'season': 'DJF', 'timeshift': -2},
+    #     {'season': 'NDJF', 'timeshift': -2},
+    #     {'season': 'DJFM', 'timeshift': -3},
+    #     {'season': 'NDJFM', 'timeshift': -3},
+    #     {'season': 'NDJ', 'timeshift': -1},
+    #     {'season': 'ONDJ', 'timeshift': -1},
+    # ]
+    season_index = [d['season'] for d in dic.season_timeshift].index(season)
+    season = dic.season_timeshift[season_index]['timeshift']
+
+    # print the season
+    print("season: ", season)
 
     # If season is defined as 'season' within the dictionary
     # then we shift the time axis by the 'timeshift' value
