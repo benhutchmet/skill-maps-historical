@@ -471,15 +471,15 @@ def constrain_historical_data_season(historical_data, start_year, end_year, seas
     """
 
     # Extract the data for this model and member
-    data = historical_data[model][member]
+    data = historical_data[model][member].psl
 
     # print the type of dat
     print("type of data in constrain historical data season", type(data))
 
-    # Verify that the data is an xarray dataset
-    if not isinstance(data, xr.Dataset):
-        print("Error, data is not an xarray dataset")
-        return None
+    # # Verify that the data is an xarray dataset
+    # if not isinstance(data, xr.Dataset):
+    #     print("Error, data is not an xarray dataset")
+    #     return None
 
     # Extract the months from the season string
     months = dic.season_months[season]
@@ -506,8 +506,8 @@ def constrain_historical_data_season(historical_data, start_year, end_year, seas
 
         # Return the data
         return data
-    except e as err:
-        print("Error, failed to constrain data: ", err)
+    except Exception as e:
+        print("Error, failed to constrain data: ", e)
         return None
     
 
@@ -515,13 +515,19 @@ def constrain_historical_data_season(historical_data, start_year, end_year, seas
 # This function takes as arguments: the historical data dictionary
 # which contains the data for the selected years and season
 # the model name and the member index
-def calculate_historical_anomalies_season(historical_data, model, member):
+def calculate_historical_anomalies_season(constrained_data, historical_data, model, member):
     """
     Calculates the anomalies for the historical data.
     """
 
-    # Extract the data for this model and member
-    data = historical_data[model][member].psl
+    # Extract the data for this member
+    member_data = constrained_data
+
+    # print the dimensions of the member data
+    print("member_data dimensions: ", member_data.dims)
+
+    # find all of the members for this model
+    model_members = historical_data[model]
 
     # Print the values of the data
     #print("data values: ", data.values)
@@ -532,7 +538,7 @@ def calculate_historical_anomalies_season(historical_data, model, member):
     #     return None
     
     # Check that the xarray dataset contains values other than NaN
-    if data.isnull().all():
+    if member_data.isnull().all():
         print("Data is null when calculating anomalies")
         print("Error, data contains only NaN values")
         return None
@@ -541,16 +547,17 @@ def calculate_historical_anomalies_season(historical_data, model, member):
         # print that we are calculating the anomalies
         print("Calculating anomalies")
 
-        # Calculate the mean over the time axis
-        data_climatology = data.mean(dim='time')
-
+        # Calculate the climatology from the time mean
+        # of all of the members for this model
+        data_climatology = model_members.mean(dim='member')
+        
         # print the data climatology
-        print("data_climatology: ", data_climatology)
+        # print("data_climatology: ", data_climatology)
         # print the shape of the data climatology
         print("shape of data_climatology: ", np.shape(data_climatology))
 
         # Calculate the anomalies
-        data_anomalies = data - data_climatology
+        data_anomalies = member_data - data_climatology
 
         # Return the anomalies
         return data_anomalies
@@ -753,7 +760,7 @@ def process_historical_data(historical_data, season, forecast_range, start_year,
             print("constrained_data dimensions: ", constrained_data.dims)
 
             # Calculate the anomalies
-            constrained_data_anoms = calculate_historical_anomalies_season(constrained_data, model, member)
+            constrained_data_anoms = calculate_historical_anomalies_season(constrained_data, historical_data, model, member)
 
             # Check that the data is not empty
             if constrained_data_anoms is None:
