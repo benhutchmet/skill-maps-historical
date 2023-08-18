@@ -390,7 +390,6 @@ def load_historical_data(model_dict, var, region):
     """
     Loads the historical data as a dictionary of xarray datasets for each model.
     """
-
     # Initialize the dictionary
     historical_data = {}
 
@@ -522,7 +521,10 @@ def calculate_historical_anomalies_season(historical_data, model, member):
     """
 
     # Extract the data for this model and member
-    data = historical_data[model][member]
+    data = historical_data[model][member].psl
+
+    # Print the values of the data
+    print("data values: ", data.values)
 
     # Verify that the data is an xarray dataset
     if not isinstance(data, xr.Dataset):
@@ -531,10 +533,14 @@ def calculate_historical_anomalies_season(historical_data, model, member):
     
     # Check that the xarray dataset contains values other than NaN
     if data.isnull().all():
+        print("Data is null when calculating anomalies")
         print("Error, data contains only NaN values")
         return None
 
     try:
+        # print that we are calculating the anomalies
+        print("Calculating anomalies")
+
         # Calculate the mean over the time axis
         data_climatology = data.mean(dim='time')
 
