@@ -527,9 +527,9 @@ def calculate_historical_anomalies_season(historical_data, model, member):
     print("data values: ", data.values)
 
     # Verify that the data is an xarray dataset
-    if not isinstance(data, xr.Dataset):
-        print("Error, data is not an xarray dataset")
-        return None
+    # if not isinstance(data, xr.Dataset):
+    #     print("Error, data is not an xarray dataset")
+    #     return None
     
     # Check that the xarray dataset contains values other than NaN
     if data.isnull().all():
@@ -564,20 +564,24 @@ def calculate_annual_mean_anomalies(historical_data, model, member, season):
     """
 
     # Extract the data for this model and member
-    data = historical_data[model][member]
+    data = historical_data[model][member].psl
 
     # Verify that the data is an xarray dataset
-    if not isinstance(data, xr.Dataset):
-        print("Error, data is not an xarray dataset")
-        return None
+    # if not isinstance(data, xr.Dataset):
+    #     print("Error, data is not an xarray dataset")
+    #     return None
     
     # Check that the xarray dataset contains values other than NaN
     if data.isnull().all():
         print("Error, data contains only NaN values")
         return None
     
+    # print the type of the dic.season_timeshift
+    print("type of dic.season_timeshift: ", type(dic.season_timeshift))
+    
     # Set up the season from the season_timeshift dictionary
-    season = dic.season_timeshift[season]
+    season_index = dic.season_names.index(season)
+    season = dic.season_timeshift[season_index]
 
     # If season is defined as 'season' within the dictionary
     # then we shift the time axis by the 'timeshift' value
@@ -626,12 +630,12 @@ def calculate_running_mean(historical_data, model, member, forecast_range):
     """
 
     # Extract the data for this model and member
-    data = historical_data[model][member]
+    data = historical_data[model][member].psl
 
     # Verify that the data is an xarray dataset
-    if not isinstance(data, xr.Dataset):
-        print("Error, data is not an xarray dataset")
-        return None
+    # if not isinstance(data, xr.Dataset):
+    #     print("Error, data is not an xarray dataset")
+    #     return None
     
     # Check that the xarray dataset contains values other than NaN
     if data.isnull().all():
@@ -743,7 +747,7 @@ def process_historical_data(historical_data, season, forecast_range, start_year,
 
             # Check that the data is not empty
             if data is None:
-                print("Error, data is empty")
+                print("Error, data is empty post annual mean")
                 return None
 
             # Calculate the running mean
@@ -751,7 +755,7 @@ def process_historical_data(historical_data, season, forecast_range, start_year,
 
             # Check that the data is not empty
             if data is None:
-                print("Error, data is empty")
+                print("Error, data is empty post running mean")
                 return None
 
             # Add the data to the member dictionary
