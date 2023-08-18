@@ -436,41 +436,21 @@ def load_historical_data(model_dict, var, region):
         # Set up the member counter
         member = 0
 
-        # Set up the files
-        files = glob.glob(regrid_files)
+        # Load the data for all members using xr.open_mfdataset()
+        data = xr.open_mfdataset(regrid_files, combine='nested', concat_dim='member', parallel=True, chunks={'time': 50})
 
-        # Loop over the files
-        for file in files:
-            
-            # Load the data for this member
-            data = xr.open_dataset(file, chunks={'time': 50})
-
-            # look at the data
-            # print("data:", data)
-
-            # Print the type of the data
-            #print("type of data", type(data))
+        # Loop over the members
+        for member in range(num_files):
+            # Get the data for this member
+            member_data = data.isel(member=member)
 
             # Check if the data is full of NaNs
-            if np.isnan(data[var]).all():
+            if np.isnan(member_data[var]).all():
                 print("Error, data is full of NaNs")
                 return None
 
             # Add this data to the member dictionary
-            member_dict[member] = data
-
-            # Increment the member counter
-            member += 1
-
-        # print the value of member_dict
-        # print("member_dict:", member_dict)
-        print("type of member_dict", type(member_dict))
-        print("len of member_dict", len(member_dict))
-
-        # print the value of model
-        print("model:", model)
-        print("type of model", type(model))
-        print("len of model", len(model))
+            member_dict[member] = member_data
 
         # Add the member dictionary to the historical data dictionary
         historical_data[model] = member_dict
@@ -479,7 +459,6 @@ def load_historical_data(model_dict, var, region):
     # print("historical_data:", historical_data)
     print("type of historical_data", type(historical_data))
     print("shape of historical_data", np.shape(historical_data))
-
 
     # Return the historical data dictionary
     return historical_data
@@ -702,6 +681,17 @@ def calculate_running_mean(historical_data, model, member, forecast_range):
 def process_historical_data(historical_data, season, forecast_range, start_year, end_year):
     """
     Loops over the models and members to calculate the annual mean anomalies where the rolling mean has been taken.
+    
+    Arguments:
+    historical_data -- the historical data dictionary
+    season -- the season
+    forecast_range -- the forecast range
+    start_year -- the start year
+    end_year -- the end year
+
+    Returns:
+    historical_data_processed -- the processed historical data dictionary
+    
     """
 
     # Initialize the dictionary
