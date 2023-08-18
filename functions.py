@@ -21,6 +21,7 @@ from PIL import Image
 import multiprocessing
 import dask.array as da
 import dask.distributed as dd
+import dask
 
 # Import CDO
 from cdo import *
@@ -514,6 +515,47 @@ def constrain_historical_data_season(historical_data, start_year, end_year, seas
         return None
     
 
+def constrain_historical_data_season_dask(historical_data, start_year, end_year, season, model, member):
+    """
+    Constrains the historical data to given years and season.
+    """
+
+    # Extract the data for this model and member
+    data = historical_data[model][member].psl
+
+    # Convert the data to a dask array
+    data = da.from_array(data)
+
+    # Extract the months from the season string
+    months = dic.season_months[season]
+
+    # Check that the months are not empty
+    # and are a list of integers
+    if len(months) == 0:
+        print("Error, months are empty")
+        return None
+    elif not isinstance(months, list):
+        print("Error, months are not a list")
+        return None
+    elif not all(isinstance(item, int) for item in months):
+        print("Error, months are not all integers")
+        return None
+
+    # Format this as a try except block
+    try:
+        # Constrain the data to the given years
+        data = data[(data['time.year'] >= start_year) & (data['time.year'] <= end_year)]
+
+        # Select the months from the dataset
+        data = data[(da.isin(data['time.month'], months))]
+
+        # Return the data
+        return data
+    except Exception as e:
+        print("Error, failed to constrain data: ", e)
+        return None
+    
+
 # Now we want to define a function which will calculate anomalies for the historical data
 # This function takes as arguments: the historical data dictionary
 # which contains the data for the selected years and season
@@ -791,6 +833,71 @@ def process_historical_data(historical_data, season, forecast_range, start_year,
 
             # Add the data to the member dictionary
             member_dict[member] = constrained_data_anoms_annual_rm
+
+        # Add the member dictionary to the historical data dictionary
+        historical_data_processed[model] = member_dict
+
+    # Return the historical data dictionary
+    return historical_data_processed
+
+# Try this using dask delayed for parallel processing
+def process_historical_data_dask(historical_data, season, forecast_range, start_year, end_year):
+    """
+    Loops over the models and members to calculate the annual mean anomalies where the rolling mean has been taken.
+    
+    Arguments:
+    historical_data -- the historical data dictionary
+    season -- the season
+    forecast_range -- the forecast range
+    start_year -- the start year
+    end_year -- the end year
+
+    Returns:
+    historical_data_processed -- the processed historical data dictionary
+    
+    """
+
+    # Initialize the dictionary
+    historical_data_processed = {}
+
+    # Set up the test model case
+    test_model = [ "BCC-CSM2-MR" ]
+
+    # Loop over the models
+    # these are define by the model_name key in the dictionary
+    for model in test_model:
+        # Print the model name
+        print("processing model: ", model)
+
+        # Initialize the member dictionary
+        member_dict = {}
+
+        # Loop over the members
+        # these are defined by the member index key in the dictionary
+        delayed_members = []
+        for member in historical_data[model]:
+
+            # Print the member index
+            print("processing member: ", member)
+
+            # Constrain the data to the given year and season
+            delayed_constrained_data = dask.delayed(constrain_historical_data_season)(historical_data, start_year, end_year, season, model, member)
+
+            # Calculate the anomalies
+            delayed_constrained_data_anoms = dask.delayed(calculate_historical_anomalies_season)(delayed_constrained_data, historical_data, model, member)
+
+            # Calculate the annual mean anomalies
+            delayed_constrained_data_anoms_annual = dask.delayed(calculate_annual_mean_anomalies)(delayed_constrained_data_anoms, season)
+
+            # Calculate the running mean
+            delayed_constrained_data_anoms_annual_rm = dask.delayed(calculate_running_mean)(delayed_constrained_data_anoms_annual, forecast_range)
+
+            # Add the data to the member dictionary
+            delayed_member = dask.delayed(member_dict.__setitem__)(member, delayed_constrained_data_anoms_annual_rm)
+            delayed_members.append(delayed_member)
+
+        # Compute the delayed members using dask.compute()
+        dask.compute(*delayed_members)
 
         # Add the member dictionary to the historical data dictionary
         historical_data_processed[model] = member_dict
