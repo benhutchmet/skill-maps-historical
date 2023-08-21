@@ -287,32 +287,56 @@ def call_mergetime_regrid(model, variable, region):
         print("Error, model_dictionary not found for variable: ", variable)
         return None
     
-    # Now we need to check whether the model_dictionary contains the model
-    # these are stored as 'model_name' in the dictionary
-    # Loop over the model_dictionary to see whether the model exists
-    # Loop over the indices of the model_name list
-    for i in range(len(model_dictionary['model_name'])):
-        # Get the current model name using the index
-        model_name = model_dictionary['model_name'][i]
-        if model == model_name:
-            print("Found model: ", model)
-            print("model_name: ", model_name)
-            # Now set the model_name to be used
-            model_name = model_name
-            break
-        else:
-            print("No model found: ", model)
-            print("model_name: ", model_name)
-            # Now set the model_name to be used
-            model_name = None
 
-    # Check that the model_name is not None
-    if model_name is None:
-        print("Error, model_name is None")
-        return None
+    print("model_dictionary: ", model_dictionary)
+
+    # print the length of the model_dictionary
+    print("len(model_dictionary): ", len(model_dictionary))
+
+    # print the type of the model_dictionary
+    print("type(model_dictionary): ", type(model_dictionary))
+
+    # # print the len of model_dictionary model_name
+    # print("len(model_dictionary['model_name']): ", len(model_dictionary['model_name']))
+
+    
+
+    # # set up a trial loop
+    # print("test loop")
+    # # set up the no. to loop over
+    # models = len(model_dictionary['model_name'])
+
+
+    # loop over the model dictionaries
+    for model_dict in model_dictionary:
+        # print the model_dict
+        print("model_dict: ", model_dict)
+        # print the type of the model_dict
+        #print("type(model_dict): ", type(model_dict))
+        # Check if the model name matches the model
+        if model_dict['model_name'] == model:
+            print("Found model: ", model)
+            # Print the model_dict 
+            print("model_dict: ", model_dict)
+            # print the type of the model_dict
+            print("type(model_dict): ", type(model_dict))
+            # Now set the model_dict to be used
+            model_dictionary = model_dict
+            break
+
+    # Check that the model is not None
+    # if model is None:
+    #     print("Error, model_name is None")
+    #     return None
+
+    # print the model_dictionary
+    print("model_dictionary to be extracted from: ", model_dictionary)
     
     # Extract the runs for the model
-    runs = model_dictionary['runs'][model_name]
+    runs = model_dictionary['runs']
+
+    # print the runs
+    print("runs: ", runs)
 
     # if the runs are a range e.g. 1-3, then split them
     if '-' in runs:
@@ -321,15 +345,22 @@ def call_mergetime_regrid(model, variable, region):
         runs = list(map(int, runs))
         # create a list of runs
         runs = list(range(runs[0], runs[1]+1))
+
+        # Print the runs
+        #print("runs for model ", model_dictionary, ": ", runs)
     elif ',' in runs:
         runs = runs.split(',')
         # convert the strings to integers
         runs = list(map(int, runs))
+        # Print the runs
+        #print("runs for model ", model_dictionary, ": ", runs)
     else:
         runs = [int(runs)]
+        # Print the runs
+        #print("runs for model ", model_dictionary, ": ", runs)
 
     # Print the runs
-    print("runs for model ", model_dictionary[model_name], ": ", runs)
+    print("runs for model ", model_dictionary, ": ", runs)
 
     # Loop over the runs
     for run in runs:
@@ -338,7 +369,7 @@ def call_mergetime_regrid(model, variable, region):
         print("processing run: ", run)
 
         # Extract the init schemes for the model
-        init_scheme = model_dictionary['init_schemes'][model_name]
+        init_scheme = model_dictionary['init_schemes']
 
         # if the init schemes are not a single number, then echo an error
         # and exit
@@ -354,7 +385,7 @@ def call_mergetime_regrid(model, variable, region):
 
         # Extract the physics schemes for the model
         # these are stored as 'physics_scheme' in the dictionary
-        physics_schemes = model_dictionary['physics_scheme'][model_name]
+        physics_schemes = model_dictionary['physics_scheme']
 
         # If the physics schemes are a range, then split them
         # and loop over them
@@ -371,7 +402,7 @@ def call_mergetime_regrid(model, variable, region):
 
             # Print that there are multiple physics schemes
             # and that they will be looped over
-            print("Multiple physics schemes found for model: ", model_name)
+            print("Multiple physics schemes found for model: ", model)
 
             for physics_scheme in physics_schemes:
                 
@@ -381,7 +412,7 @@ def call_mergetime_regrid(model, variable, region):
                 # Extract the forcing schemes for the model
                 # these are stored as 'forcing_scheme' in the dictionary
                 # and are a string
-                forcing_scheme = model_dictionary['forcing_scheme'][model_name]
+                forcing_scheme = model_dictionary['forcing_scheme']
 
                 # if the forcing schemes are not a single number, then echo an error
                 # and exit
@@ -396,7 +427,7 @@ def call_mergetime_regrid(model, variable, region):
 
                 # Now call the merge_time_axis function
                 # to merge the files along the time axis
-                merged_file = merge_time_axis(model_name, variable, run, init_scheme, physics_scheme, forcing_scheme, dic.base_path_example)
+                merged_file = merge_time_axis(model, variable, run, init_scheme, physics_scheme, forcing_scheme, dic.base_path_example)
 
                 # print the type of the merged_file
                 print("type(merged_file): ", type(merged_file))
@@ -407,7 +438,7 @@ def call_mergetime_regrid(model, variable, region):
                     #return None
 
                 # Now call the regrid function
-                regridded_file = regrid(model_name, variable, run, init_scheme, physics_scheme, forcing_scheme, region)
+                regridded_file = regrid(model, variable, run, init_scheme, physics_scheme, forcing_scheme, region)
 
                 # if the regridded_file is None, then continue
                 if regridded_file is None:
@@ -423,7 +454,7 @@ def call_mergetime_regrid(model, variable, region):
 
             # Extract the forcing schemes for the model
             # these are stored as 'forcing_scheme' in the dictionary
-            forcing_scheme = model_dictionary['forcing_scheme'][model_name]
+            forcing_scheme = model_dictionary['forcing_scheme']
 
             # print the forcing scheme
             print("forcing_scheme: ", forcing_scheme)
@@ -435,7 +466,7 @@ def call_mergetime_regrid(model, variable, region):
                 return None
             
             # Merge the files along the time axis
-            merged_file = merge_time_axis(model_name, variable, run, init_scheme, physics_scheme, forcing_scheme, dic.base_path_example)
+            merged_file = merge_time_axis(model, variable, run, init_scheme, physics_scheme, forcing_scheme, dic.base_path_example)
 
             # print the type of the merged_file
             print("type(merged_file): ", type(merged_file))
@@ -446,7 +477,7 @@ def call_mergetime_regrid(model, variable, region):
                 #return None
 
             # Now call the regrid function
-            regridded_file = regrid(model_name, variable, run, init_scheme, physics_scheme, forcing_scheme, region)
+            regridded_file = regrid(model, variable, run, init_scheme, physics_scheme, forcing_scheme, region)
 
             # if the regridded_file is None, then continue
             if regridded_file is None:
