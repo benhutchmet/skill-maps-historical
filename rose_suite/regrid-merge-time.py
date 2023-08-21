@@ -32,6 +32,7 @@ import sys
 import glob
 import re
 import argparse
+import time
 
 # Import CDO module
 from cdo import *
@@ -147,10 +148,10 @@ def merge_time_axis(model, var, run, init, physics, forcing, base_path):
 
             # if the output file already exists, don't do anything
             if os.path.exists(output_file):
-                print("Output file already exists")
+                print("Output file already exists for mergetime")
                 return output_file
             else:
-                print("Output file does not exist")
+                print("Output file does not exist for mergetime")
         
                 # Now merge the files
                 # Using cdo mergetime
@@ -232,10 +233,10 @@ def regrid(model, var, run, init, physics, forcing, region):
 
     # if the output file already exists, don't do anything
     if os.path.exists(output_file):
-        print("Output file already exists")
+        print("Output file already exists for regrid")
         return output_file
     else:
-        print("Output file does not exist")
+        print("Output file does not exist for regrid")
         
         try:
             # Now regrid the file
@@ -465,8 +466,14 @@ def call_mergetime_regrid(model, variable, region):
                 print("Error, forcing schemes are not a single number")
                 return None
             
+            # track before and after the loop
+            print("before merging files")
+
             # Merge the files along the time axis
             merged_file = merge_time_axis(model, variable, run, init_scheme, physics_scheme, forcing_scheme, dic.base_path_example)
+
+            # track before and after the loop
+            print("after merging files")
 
             # print the type of the merged_file
             print("type(merged_file): ", type(merged_file))
@@ -513,9 +520,18 @@ def main():
     print("variable: ", variable)
     print("region: ", region)
 
+    # Start a timer to measure the time taken to run the script
+    start = time.time()
+
     try:
         # Call the call_mergetime_regrid function
         call_mergetime_regrid(model, variable, region)
+
+        # Print a message to say that the script has finished
+        print("Script finished successfully")
+
+        # Print the time taken to run the script
+        print("Time taken to run script: ", time.time() - start, " seconds")
     except Exception as err:
         print("[ERROR] Failed to call call_mergetime_regrid function for model: ", model + ", variable: ", variable + ", region: ", region, err)
 
