@@ -336,6 +336,64 @@ def annual_mean_anoms(historical_data_constrained_anoms, season):
     # Return the data
     return data
 
+# Now set up the function for caluclating the running mean
+def calculate_running_mean(historical_data_constrained_anoms_annual_mean, forecast_range):
+    """
+    Calculate the running mean for each member for the historical data which has
+    been constrained to the specified season and years, the model climatology has
+    been removed and the annual mean anomalies have been calculated (shifted back if necessary).
+    """
+
+    # Print a message to the screen
+    print('Calculating the running mean for the forecast range: ' + forecast_range)
+
+    # if the forecast range is 2-2
+    if forecast_range == '2-2':
+        print("Forecast range is 2-2, so running mean does not need to be calculated")
+        return historical_data_constrained_anoms_annual_mean
+    else:
+        print("Forecast range is not 2-2, so running mean needs to be calculated")
+
+        # Extract the start and end years from the forecast_range
+        start_year = forecast_range.split('-')[0]
+        end_year = forecast_range.split('-')[1]
+
+        # Print the start and end years
+        print("start_year: ", start_year)
+        print("end_year: ", end_year)
+
+        # Print the forecast range
+        print("forecast_range: ", start_year + "-" + end_year)
+
+        # Calculate the running mean value
+        running_mean_value = int(end_year) - int(start_year) + 1
+
+        # Print the running mean value
+        print("running_mean_value: ", running_mean_value)
+
+        # Calculate the running mean
+        try:
+            # Loop over the members
+            data = historical_data_constrained_anoms_annual_mean
+            for member in data:
+                # Calculate the running mean
+                data[member] = data[member].rolling(time=running_mean_value, center=True).mean()
+
+                # Get rid of the NaNs
+                # Only for years containing only NaNs
+                data[member] = data[member].dropna(dim='time', how='all')
+
+        except Exception as error:
+            print(error)
+            print("Unable to calculate the running mean for the forecast range: ", forecast_range)
+            return None
+        
+        # Print a message to the screen
+        print('Calculated the running mean for the forecast range: ', forecast_range)
+
+        # Return the data
+        return data
+
 # Set up the main function for testing purposes
 def main():
     """
@@ -448,17 +506,8 @@ def main():
         # Print a message to the screen
         print('Calculated the annual mean anomalies')
 
-        # Print the data
-        print("Data: ", historical_data_constrained_anoms_annual_mean)
-
-        # loop over the members
-        # and print the psl values
-        data = historical_data_constrained_anoms_annual_mean
-        for member in data:
-            # Print the values of the member
-            print("Values of the member: ", data[member])
-            # print the variant label
-            print("Variant label: ", member)
+        # # Print the data
+        # print("Data: ", historical_data_constrained_anoms_annual_mean)
 
         # Print the time taken
         print("Time taken to calculate the annual mean anomalies: ", time.time() - start_time, " seconds")
@@ -466,6 +515,8 @@ def main():
         print(error)
         print("Unable to calculate the annual mean anomalies in main")
         sys.exit()
+
+
 
 # Call the main function
 # If we are running this script interactively
