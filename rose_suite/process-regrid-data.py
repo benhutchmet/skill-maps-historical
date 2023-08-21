@@ -45,6 +45,7 @@ import time
 
 # Third-party imports
 import numpy as np
+import collections
 import pandas as pd
 import xarray as xr
 from datetime import datetime
@@ -551,7 +552,7 @@ def main():
         print(error)
         print("Unable to calculate the running mean in main")
         sys.exit()
-        
+
     # Print a message to the screen
     print('Data processing complete, saving the data for ' + model + ' ' + variable + ' ' + region + ' ' + season + ' ' + forecast_range + ' ' + start_year + ' ' + end_year)
 
