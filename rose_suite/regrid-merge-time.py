@@ -18,7 +18,7 @@ Usage:
 
     regrid-merge-time.py <model> <variable> <region>
     
-    model:    Model name, e.g. 'HadGEM3-GC31-MM'
+    model:    Model name, e.g. 'HadGEM3-GC31-MM' or '5'
     variable: Variable name, e.g. 'tas'
     region:   Region name, e.g. 'north-atlantic'
     
@@ -519,6 +519,22 @@ def main():
     print("model: ", model)
     print("variable: ", variable)
     print("region: ", region)
+
+    # If the model is a number, then convert it to it's model string
+    if model.isdigit():
+        # Print the model number
+        print("model number: ", model)
+
+        # Extract the numbered element from the list of models
+        model = dic.models[int(model) - 1]
+
+        # Print the model string
+        print("model string: ", model)
+        print("merging time and regridding for model: ", model)
+    else:
+        # Print the model string
+        print("model string: ", model)
+        print("merging time and regridding for model: ", model)
 
     # Start a timer to measure the time taken to run the script
     start = time.time()
