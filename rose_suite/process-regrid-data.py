@@ -191,22 +191,34 @@ def calculate_remove_model_climatology(historical_data_constrained):
     For the selected season and years, calculate and remove the model climatology from each member.
     """
 
-    # We want to perform these operations on the psl variable
-    historical_data_constrained = historical_data_constrained.psl
+    # Concatenate the data along the variant_label dimension
+    historical_data_constrained_ensemble = xr.concat(historical_data_constrained.values(), dim='variant_label')
 
     # Print the dimensions of the data
-    print("Dimensions of the data after psl selected: ", historical_data_constrained.dims)
+    print("Dimensions of the data after psl selected: ", historical_data_constrained_ensemble)
 
     # Print a message to the screen
     print('Calculating and removing the model climatology...')
 
     # Calculate the model climatology
     try:
+
         # Take the mean over all of the members
-        members_ensemble_mean = historical_data_constrained.mean(dim='variant_label')
+        members_ensemble_mean = historical_data_constrained_ensemble.mean(dim='variant_label')
+
+        # Print the dimensions of the members_ensemble_mean
+        print("Dimensions of the members_ensemble_mean: ", members_ensemble_mean.dims)
 
         # Take the time mean of this ensemble mean
         model_climatology = members_ensemble_mean.mean(dim='time')
+
+        # print the values of the model_climatology
+        # TODO: Make flexible for different variables (e.g. tas, psl, rsds etc.)
+        print("Psl Values of the model_climatology: ", model_climatology.psl.values)
+
+        # Print the shape of the psl values of the model_climatology
+        # TODO: Make flexible for different variables (e.g. tas, psl, rsds etc.)
+        print("Shape of the psl values of the model_climatology: ", model_climatology.psl.values.shape)
 
         # Print the dimensions of the model_climatology
         print("Dimensions of the model_climatology: ", model_climatology.dims)
@@ -219,15 +231,34 @@ def calculate_remove_model_climatology(historical_data_constrained):
     try:
         # Loop over the members
         for member in historical_data_constrained:
+            # Print the type of the member
+            print("Type of member: ", type(member))
+
+            # Print the dimensions of the member
+            print("Dimensions of the member: ", historical_data_constrained[member].dims)
+
+            # Print the member
+            # print("Member: ", historical_data_constrained[member])
+
+            # # Print the values of the member
+            # print("Values of the member: ", historical_data_constrained[member].values)
+
+
             # Remove the model climatology from the member
-            historical_data_constrained[member] = historical_data_constrained[member] - model_climatology
+            # TODO: Make flexible for different variables (e.g. tas, psl, rsds etc.)
+            historical_data_constrained[member].psl.values = historical_data_constrained[member].psl.values - model_climatology.psl.values
     except Exception as error:
         print(error)
         print("Unable to remove the model climatology...")
         return None
     
     # Print a message to the screen
-    print('Removed the model climatology...')
+    print('Removed the model climatology for the psl variable from model members...')
+
+    # Loop over the members and print the values
+    # for member in historical_data_constrained:
+    #     # Print the values of the member
+    #     print("Values of the member: ", historical_data_constrained[member].psl.values)
 
     # Return the data
     return historical_data_constrained
