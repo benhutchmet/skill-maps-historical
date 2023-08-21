@@ -275,11 +275,6 @@ def call_mergetime_regrid(model, variable, region):
     print("region: ", region)
 
     # First check that whether a dictionary exists for the variable
-    # Using the model dictionary list
-    # if the variable is 'psl', then model_dictionary = dic. model_dictionary_psl_historical_badc
-    # if the variable is 'tas', then model_dictionary = dic. model_dictionary_tas_historical_badc
-    # if the variable is 'sfcWind', then model_dictionary = dic. model_dictionary_sfcWind_historical_badc
-    # if the variable is 'rsds', then model_dictionary = dic. model_dictionary_rsds_historical_badc
     if variable == 'psl':
         model_dictionary = dic.model_dictionary_psl_historical_badc
     elif variable == 'tas':
@@ -295,7 +290,10 @@ def call_mergetime_regrid(model, variable, region):
     # Now we need to check whether the model_dictionary contains the model
     # these are stored as 'model_name' in the dictionary
     # Loop over the model_dictionary to see whether the model exists
-    for model_name in model_dictionary['model_name']:
+    # Loop over the indices of the model_name list
+    for i in range(len(model_dictionary['model_name'])):
+        # Get the current model name using the index
+        model_name = model_dictionary['model_name'][i]
         if model == model_name:
             print("Found model: ", model)
             print("model_name: ", model_name)
