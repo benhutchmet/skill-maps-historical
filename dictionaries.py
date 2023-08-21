@@ -179,6 +179,9 @@ model_dictionary_rsds_historical_badc = [
     {'model_name': 'NorCPM1', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'}
 ]
 
+# Create a list of the model dictionaries
+model_dictionary_list = [model_dictionary_sfcWind_historical_badc, model_dictionary_psl_historical_badc, model_dictionary_tas_historical_badc, model_dictionary_rsds_historical_badc]
+
 season_months = {
     "DJF": [12, 1, 2],
     "MAM": [3, 4, 5],
