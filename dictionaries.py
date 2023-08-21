@@ -117,6 +117,9 @@ uk_s_box = {
     'lat2': 51
 }
 
+# models = [ "BCC-CSM2-MR", "MPI-ESM1-2-HR", "CanESM5", "CMCC-CM2-SR5", "HadGEM3-GC31-MM", "EC-Earth3", "MPI-ESM1-2-LR", "FGOALS-f3-L", "MIROC6", "IPSL-CM6A-LR", "CESM1-1-CAM5-CMIP5", "NorCPM1" ]
+
+
 # Set up the model_dictionary for the sfcWind historical models
 model_dictionary_sfcWind_historical_badc = [
     {'model_name': 'BCC-CSM2-MR', 'runs': '1-3', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
@@ -131,6 +134,10 @@ model_dictionary_sfcWind_historical_badc = [
     {'model_name': 'IPSL-CM6A-LR', 'runs': '1-31', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'}
 ]
 
+# set up the numbers for the sfcWind historical models
+model_dictionary_sfcWind_historical_badc_numbers = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]
+
+#models = [ "BCC-CSM2-MR", "MPI-ESM1-2-HR", "CanESM5", "CMCC-CM2-SR5", "HadGEM3-GC31-MM", "EC-Earth3", "MPI-ESM1-2-LR", "FGOALS-f3-L", "MIROC6", "IPSL-CM6A-LR", "CESM1-1-CAM5-CMIP5", "NorCPM1" ]
 # Set up the model_dictionary for the psl historical models
 # stored in the CMIP6 archive on JASMIN (badc)
 model_dictionary_psl_historical_badc = [
@@ -147,6 +154,10 @@ model_dictionary_psl_historical_badc = [
     {'model_name': 'NorCPM1', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'}
 ]
 
+# set up the numbers for the psl historical models
+model_dictionary_psl_historical_badc_numbers = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12 ]
+
+# models = [ "BCC-CSM2-MR", "MPI-ESM1-2-HR", "CanESM5", "CMCC-CM2-SR5", "HadGEM3-GC31-MM", "EC-Earth3", "MPI-ESM1-2-LR", "FGOALS-f3-L", "MIROC6", "IPSL-CM6A-LR", "CESM1-1-CAM5-CMIP5", "NorCPM1" ]
 # Set up the model_dictionary for the tas historical models
 # stored in the CMIP6 archive on JASMIN (badc)
 model_dictionary_tas_historical_badc = [
@@ -163,6 +174,10 @@ model_dictionary_tas_historical_badc = [
     {'model_name': 'NorCPM1', 'runs': '30', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'}
 ]
 
+# set up the numbers for the tas historical models
+model_dictionary_tas_historical_badc_numbers = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12 ]
+
+# models = [ "BCC-CSM2-MR", "MPI-ESM1-2-HR", "CanESM5", "CMCC-CM2-SR5", "HadGEM3-GC31-MM", "EC-Earth3", "MPI-ESM1-2-LR", "FGOALS-f3-L", "MIROC6", "IPSL-CM6A-LR", "CESM1-1-CAM5-CMIP5", "NorCPM1" ]
 # Set up the model_dictionary for the rsds historical models
 # stored in the CMIP6 archive on JASMIN (badc)
 model_dictionary_rsds_historical_badc = [
@@ -178,6 +193,9 @@ model_dictionary_rsds_historical_badc = [
     {'model_name': 'IPSL-CM6A-LR', 'runs': '1-31', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
     {'model_name': 'NorCPM1', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'}
 ]
+
+# set up the numbers for the rsds historical models
+model_dictionary_rsds_historical_badc_numbers = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12 ]
 
 # Create a list of the model dictionaries
 model_dictionary_list = [model_dictionary_sfcWind_historical_badc, model_dictionary_psl_historical_badc, model_dictionary_tas_historical_badc, model_dictionary_rsds_historical_badc]
