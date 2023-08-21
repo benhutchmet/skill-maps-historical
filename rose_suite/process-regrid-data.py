@@ -107,21 +107,36 @@ def load_data(model, variable, region):
     # Set up the member counter
     member_counter = 0
 
-    # Load the data for all members using xr.open_mfdataset()
-    # in parallel mode
-    historical_data = xr.open_mfdataset(regrid_files, combine='nested', concat_dim='variant_label', parallel=True, chunks={'time': 100, 'lat': 45, 'lon': 45})
+    # Try an alternative method of loading the data
+    # Loop over the regridded files
+    for regrid_file in glob.glob(regrid_files):
+        # Check if the file is a .nc file
+        print("regrid_file: ", regrid_file)
+        if regrid_file.endswith('.nc'):
+            # Open the file using xarray
+            data = xr.open_dataset(regrid_file, chunks={'time': 100, 'lat': 45, 'lon': 45})
 
-    # Print a message to the screen
-    print('Loaded data for ' + model + ' ' + variable + ' ' + region + '...')
+            # Extract the variant_label
+            variant_label = data.attrs['variant_label']
 
-    # Print the type of the data
-    print("Type of historical_data: ", type(historical_data))
+            # Print the variant_label
+            print("the variant_label for " + regrid_file + " is: ", variant_label)
 
-    # Print the shape of the data
-    print("Shape of historical_data: ", historical_data.shape)
+            # Add the data to the dictionary
+            # using the variant_label as the key
+            historical_data[variant_label] = data
 
-    # Print the data
-    print("historical_data: ", historical_data)
+            # Increment the member counter
+            member_counter += 1
+
+    # Print the number of members
+    print("Number of members for " + model + ": " + str(member_counter))
+
+    # # Loop over the members
+    # for member in historical_data:
+    #     print("member: ", member)
+    #     # Look at the data for the first member
+    #     print("historical_data for the member: ", historical_data[member])
 
     return historical_data
 
