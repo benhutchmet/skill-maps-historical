@@ -220,4 +220,4 @@ season_timeshift = [
     {'season': 'ONDJ', 'timeshift': -1},
 ]
 
-
+variables = [ 'psl', 'tas', 'sfcWind', 'rsds', 'tos' ]

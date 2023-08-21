@@ -186,7 +186,7 @@ def select_season_years(historical_data, season, start_year, end_year):
         return None
 
 # Now define a function to calculate and remove the model climatology for the selected season and years
-def calculate_remove_model_climatology(historical_data_constrained):
+def calculate_remove_model_climatology(historical_data_constrained, variable):
     """
     For the selected season and years, calculate and remove the model climatology from each member.
     """
@@ -199,6 +199,19 @@ def calculate_remove_model_climatology(historical_data_constrained):
 
     # Print a message to the screen
     print('Calculating and removing the model climatology...')
+
+    # Check that the variable is valid
+    # if the variable is contained within dic.variables, then it is valid
+    if variable in dic.variables:
+        # Print a message to the screen
+        print("Variable is valid")
+    else:
+        # Print a message to the screen
+        print("Variable is not valid, exiting script")
+        sys.exit()
+
+    # Print the variable
+    print("Variable: ", variable)
 
     # Calculate the model climatology
     try:
@@ -214,11 +227,11 @@ def calculate_remove_model_climatology(historical_data_constrained):
 
         # print the values of the model_climatology
         # TODO: Make flexible for different variables (e.g. tas, psl, rsds etc.)
-        print("Psl Values of the model_climatology: ", model_climatology.psl.values)
+        print("Psl Values of the model_climatology: ", model_climatology[variable].values)
 
         # Print the shape of the psl values of the model_climatology
         # TODO: Make flexible for different variables (e.g. tas, psl, rsds etc.)
-        print("Shape of the psl values of the model_climatology: ", model_climatology.psl.values.shape)
+        print("Shape of the psl values of the model_climatology: ", model_climatology[variable].values.shape)
 
         # Print the dimensions of the model_climatology
         print("Dimensions of the model_climatology: ", model_climatology.dims)
@@ -246,7 +259,7 @@ def calculate_remove_model_climatology(historical_data_constrained):
 
             # Remove the model climatology from the member
             # TODO: Make flexible for different variables (e.g. tas, psl, rsds etc.)
-            historical_data_constrained[member].psl.values = historical_data_constrained[member].psl.values - model_climatology.psl.values
+            historical_data_constrained[member][variable].values = historical_data_constrained[member][variable].values - model_climatology[variable].values
     except Exception as error:
         print(error)
         print("Unable to remove the model climatology...")
@@ -483,7 +496,7 @@ def main():
     # Calculate and remove the model climatology for the selected season and years
     try:
         # Calculate and remove the model climatology for the selected season and years
-        historical_data_constrained_anoms = calculate_remove_model_climatology(historical_data_constrained)
+        historical_data_constrained_anoms = calculate_remove_model_climatology(historical_data_constrained, variable)
 
         # Print a message to the screen
         print('Calculated and removed the model climatology...')
@@ -526,6 +539,14 @@ def main():
 
         # # Print the data
         print("Data: ", historical_data_constrained_anoms_annual_mean_rm)
+
+        # Loop over the members
+        for member in historical_data_constrained_anoms_annual_mean_rm:
+            # Print the member
+            print("Member: ", member)
+
+            # Print the psl values of the member
+            print("Psl values of the member: ", historical_data_constrained_anoms_annual_mean_rm[member].psl.values)
 
         # Print the time taken
         print("Time taken to calculate the running mean: ", time.time() - start_time, " seconds")
