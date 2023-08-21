@@ -176,7 +176,7 @@ def select_season_years(historical_data, season, start_year, end_year):
             historical_data[member] = historical_data[member].sel(time=historical_data[member]['time.month'].isin(months))
 
         # print the dimensions of the data for the first member
-        print("Dimensions of the data post processing: ", historical_data.dims)
+        # print("data post processing: ", historical_data)
 
         # Return the data
         return historical_data
@@ -264,7 +264,7 @@ def main():
         print('Selected the season: ' + season + ' and years: ' + start_year + '-' + end_year + '...')
 
         # Print the dimensions of the data
-        print("Dimensions of the data: ", historical_data.dims)
+        # print("Dimensions of the data: ", historical_data.dims)
 
         # Print the time taken
         print("Time taken to select season and years: ", time.time() - start_time, " seconds")
