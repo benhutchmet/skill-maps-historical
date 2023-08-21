@@ -516,7 +516,23 @@ def main():
         print("Unable to calculate the annual mean anomalies in main")
         sys.exit()
 
+    # Calculate the running mean
+    try:
+        # Calculate the running mean
+        historical_data_constrained_anoms_annual_mean_rm= calculate_running_mean(historical_data_constrained_anoms_annual_mean, forecast_range)
 
+        # Print a message to the screen
+        print('Calculated the running mean')
+
+        # # Print the data
+        print("Data: ", historical_data_constrained_anoms_annual_mean_rm)
+
+        # Print the time taken
+        print("Time taken to calculate the running mean: ", time.time() - start_time, " seconds")
+    except Exception as error:
+        print(error)
+        print("Unable to calculate the running mean in main")
+        sys.exit()
 
 # Call the main function
 # If we are running this script interactively
