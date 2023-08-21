@@ -537,13 +537,13 @@ def main():
         # # Print the data
         print("Data: ", historical_data_constrained_anoms_annual_mean_rm)
 
-        # Loop over the members
-        for member in historical_data_constrained_anoms_annual_mean_rm:
-            # Print the member
-            print("Member: ", member)
+        # # Loop over the members
+        # for member in historical_data_constrained_anoms_annual_mean_rm:
+        #     # Print the member
+        #     print("Member: ", member)
 
-            # Print the psl values of the member
-            print("Psl values of the member: ", historical_data_constrained_anoms_annual_mean_rm[member].psl.values)
+        #     # Print the psl values of the member
+        #     print("Psl values of the member: ", historical_data_constrained_anoms_annual_mean_rm[member].psl.values)
 
         # Print the time taken
         print("Time taken to calculate the running mean: ", time.time() - start_time, " seconds")
@@ -551,14 +551,17 @@ def main():
         print(error)
         print("Unable to calculate the running mean in main")
         sys.exit()
-
-    # TODO: Save the data
+        
     # Print a message to the screen
     print('Data processing complete, saving the data for ' + model + ' ' + variable + ' ' + region + ' ' + season + ' ' + forecast_range + ' ' + start_year + ' ' + end_year)
 
     # Set up the path for saving the data
     # /home/users/benhutch/skill-maps-processed-data/psl/EC-Earth3/global/years_2-9/DJFM/outputs/mergetime
-    save_path = dic.home_dir + 'skill-maps-processed-data' + '/' + 'historical' + '/' + variable + '/' + model + '/' + region + '/' + 'years_' + forecast_range + '/' + season + '/' + 'outputs' + '/' + 'processed'
+    save_path = dic.home_dir + '/' + 'skill-maps-processed-data' + '/' + 'historical' + '/' + variable + '/' + model + '/' + region + '/' + 'years_' + forecast_range + '/' + season + '/' + 'outputs' + '/' + 'processed'
+
+    # If the save path does not exist then create it
+    if not os.path.exists(save_path):
+        os.makedirs(save_path)
 
     # Now loop over the members and save the data
     # for brevity
