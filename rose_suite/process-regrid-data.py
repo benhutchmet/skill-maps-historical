@@ -185,6 +185,52 @@ def select_season_years(historical_data, season, start_year, end_year):
         print("Unable to select the season: " + season + " and years: " + start_year + "-" + end_year + "...")
         return None
 
+# Now define a function to calculate and remove the model climatology for the selected season and years
+def calculate_remove_model_climatology(historical_data_constrained):
+    """
+    For the selected season and years, calculate and remove the model climatology from each member.
+    """
+
+    # We want to perform these operations on the psl variable
+    historical_data_constrained = historical_data_constrained.psl
+
+    # Print the dimensions of the data
+    print("Dimensions of the data after psl selected: ", historical_data_constrained.dims)
+
+    # Print a message to the screen
+    print('Calculating and removing the model climatology...')
+
+    # Calculate the model climatology
+    try:
+        # Take the mean over all of the members
+        members_ensemble_mean = historical_data_constrained.mean(dim='variant_label')
+
+        # Take the time mean of this ensemble mean
+        model_climatology = members_ensemble_mean.mean(dim='time')
+
+        # Print the dimensions of the model_climatology
+        print("Dimensions of the model_climatology: ", model_climatology.dims)
+    except Exception as error:
+        print(error)
+        print("Unable to calculate the model climatology...")
+        return None
+    
+    # Now remove the model climatology from each member
+    try:
+        # Loop over the members
+        for member in historical_data_constrained:
+            # Remove the model climatology from the member
+            historical_data_constrained[member] = historical_data_constrained[member] - model_climatology
+    except Exception as error:
+        print(error)
+        print("Unable to remove the model climatology...")
+        return None
+    
+    # Print a message to the screen
+    print('Removed the model climatology...')
+
+    # Return the data
+    return historical_data_constrained
 
 
 # Set up the main function for testing purposes
@@ -258,7 +304,7 @@ def main():
     # Select the season and years from the data
     try:
         # Select the season and years from the data
-        historical_data = select_season_years(historical_data, season, start_year, end_year)
+        historical_data_constrained = select_season_years(historical_data, season, start_year, end_year)
 
         # Print a message to the screen
         print('Selected the season: ' + season + ' and years: ' + start_year + '-' + end_year + '...')
@@ -271,6 +317,24 @@ def main():
     except Exception as error:
         print(error)
         print("Unable to select the season: " + season + " and years: " + start_year + "-" + end_year + "...")
+        sys.exit()
+
+    # Calculate and remove the model climatology for the selected season and years
+    try:
+        # Calculate and remove the model climatology for the selected season and years
+        historical_data_constrained_anoms = calculate_remove_model_climatology(historical_data_constrained)
+
+        # Print a message to the screen
+        print('Calculated and removed the model climatology...')
+
+        # Print the values of the data
+        print("Values of the data: ", historical_data_constrained_anoms.values)
+
+        # Print the time taken
+        print("Time taken to calculate and remove the model climatology: ", time.time() - start_time, " seconds")
+    except Exception as error:
+        print(error)
+        print("Unable to calculate and remove the model climatology in main...")
         sys.exit()
 
 # Call the main function
