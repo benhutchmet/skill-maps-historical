@@ -31,6 +31,7 @@ import os
 import sys
 import glob
 import re
+import argparse
 
 # Import CDO module
 from cdo import *
@@ -458,3 +459,43 @@ def call_mergetime_regrid(model, variable, region):
             if regridded_file is None:
                 print("Error, regridded_file is None")
                 #return None
+
+# Define a main function
+# which extracts the model, variable and region from the command line
+# and calls the call_mergetime_regrid function
+def main():
+    """
+    Main function to extract the model, variable and region from the command line. Then calls the call_mergetime_regrid function.
+    
+    :return: None
+    """    
+
+    # Parse the command line arguments
+    parser = argparse.ArgumentParser()
+    parser.add_argument('model', type=str, help='Model name, e.g. HadGEM3-GC31-MM')
+    parser.add_argument('variable', type=str, help='Variable name, e.g. tas')
+    parser.add_argument('region', type=str, help='Region name, e.g. north-atlantic')
+
+    # Extract the arguments
+    args = parser.parse_args()
+
+    # Extract the model, variable and region
+    model = args.model
+    variable = args.variable
+    region = args.region
+
+    # Print the model, variable and region
+    print("model: ", model)
+    print("variable: ", variable)
+    print("region: ", region)
+
+    try:
+        # Call the call_mergetime_regrid function
+        call_mergetime_regrid(model, variable, region)
+    except Exception as err:
+        print("[ERROR] Failed to call call_mergetime_regrid function for model: ", model + ", variable: ", variable + ", region: ", region, err)
+
+# Call the main function
+# If the modules is executed directly
+if __name__ == '__main__':
+    main()
