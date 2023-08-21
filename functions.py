@@ -386,6 +386,11 @@ def call_mergetime_regrid(model_dict, var, region):
                     print("Error, regridded file does not exist")
 
 
+# Define a new function to load the processed historical data
+# This function will take as arguments: the base directory 
+# where the data are stored, the models, the variable name, the region name, the forecast range and the season.
+
+
 # Now we want to define a function to load the historical data
 # As a dictionary of xarray datasets for each model
 # This will have dimensions: [model, members, time, lat, lon]
