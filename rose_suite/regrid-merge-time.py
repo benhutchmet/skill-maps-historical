@@ -276,25 +276,20 @@ def call_mergetime_regrid(model, variable, region):
 
     # First check that whether a dictionary exists for the variable
     # Using the model dictionary list
-    model_dictionary_list = dic.model_dictionary_list
-
-    # Loop over to see whether one exists for the variable
-    for model_dictionary in model_dictionary_list:
-        if variable in model_dictionary:
-            print("Found model dictionary for variable: ", variable)
-            print("model_dictionary: ", model_dictionary)
-            # Now set the model_dictionary to be used
-            model_dictionary = model_dictionary
-            break
-        else:
-            print("No model dictionary found for variable: ", variable)
-            print("model_dictionary: ", model_dictionary)
-            # Now set the model_dictionary to be used
-            model_dictionary = None
-
-    # Check that the model_dictionary is not None
-    if model_dictionary is None:
-        print("Error, model_dictionary is None")
+    # if the variable is 'psl', then model_dictionary = dic. model_dictionary_psl_historical_badc
+    # if the variable is 'tas', then model_dictionary = dic. model_dictionary_tas_historical_badc
+    # if the variable is 'sfcWind', then model_dictionary = dic. model_dictionary_sfcWind_historical_badc
+    # if the variable is 'rsds', then model_dictionary = dic. model_dictionary_rsds_historical_badc
+    if variable == 'psl':
+        model_dictionary = dic.model_dictionary_psl_historical_badc
+    elif variable == 'tas':
+        model_dictionary = dic.model_dictionary_tas_historical_badc
+    elif variable == 'sfcWind':
+        model_dictionary = dic.model_dictionary_sfcWind_historical_badc
+    elif variable == 'rsds':
+        model_dictionary = dic.model_dictionary_rsds_historical_badc
+    else:
+        print("Error, model_dictionary not found for variable: ", variable)
         return None
     
     # Now we need to check whether the model_dictionary contains the model
