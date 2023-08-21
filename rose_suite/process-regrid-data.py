@@ -226,11 +226,9 @@ def calculate_remove_model_climatology(historical_data_constrained, variable):
         model_climatology = members_ensemble_mean.mean(dim='time')
 
         # print the values of the model_climatology
-        # TODO: Make flexible for different variables (e.g. tas, psl, rsds etc.)
         print("Psl Values of the model_climatology: ", model_climatology[variable].values)
 
         # Print the shape of the psl values of the model_climatology
-        # TODO: Make flexible for different variables (e.g. tas, psl, rsds etc.)
         print("Shape of the psl values of the model_climatology: ", model_climatology[variable].values.shape)
 
         # Print the dimensions of the model_climatology
@@ -258,7 +256,6 @@ def calculate_remove_model_climatology(historical_data_constrained, variable):
 
 
             # Remove the model climatology from the member
-            # TODO: Make flexible for different variables (e.g. tas, psl, rsds etc.)
             historical_data_constrained[member][variable].values = historical_data_constrained[member][variable].values - model_climatology[variable].values
     except Exception as error:
         print(error)
@@ -554,6 +551,59 @@ def main():
         print(error)
         print("Unable to calculate the running mean in main")
         sys.exit()
+
+    # TODO: Save the data
+    # Print a message to the screen
+    print('Data processing complete, saving the data for ' + model + ' ' + variable + ' ' + region + ' ' + season + ' ' + forecast_range + ' ' + start_year + ' ' + end_year)
+
+    # Set up the path for saving the data
+    # /home/users/benhutch/skill-maps-processed-data/psl/EC-Earth3/global/years_2-9/DJFM/outputs/mergetime
+    save_path = dic.home_dir + 'skill-maps-processed-data' + '/' + 'historical' + '/' + variable + '/' + model + '/' + region + '/' + 'years_' + forecast_range + '/' + season + '/' + 'outputs' + '/' + 'processed'
+
+    # Now loop over the members and save the data
+    # for brevity
+    data = historical_data_constrained_anoms_annual_mean_rm
+    for member in data:
+        # Print that we are saving the data
+        print("Saving the data for member: ", member, "and model:", model)
+
+        # if variable is tos, then use 'Omon' instead of 'Amon'
+        if variable == 'tos':
+            file_name = variable + '_' + 'Omon' + '_' + model + '_' + 'historical' + '_' + member + '_' + start_year + '-' + end_year + '_' + region + '_processed.nc'
+        else:
+            # Set up the file name
+            # psl_Amon_HadGEM3-GC31-MM_historical_r1i1p1f3_g?_1850-2014.nc_global_regrid.nc
+            file_name = variable + '_' + 'Amon' + '_' + model + '_' + 'historical' + '_' + member + '_' + start_year + '-' + end_year + '_' + region + '_processed.nc'
+
+        # Set up the path to the file
+        file_path = save_path + '/' + file_name
+
+        # Print the file path
+        print("file_path: ", file_path)
+
+        # Save the data
+        try:
+            # Save the data
+            data[member].to_netcdf(file_path)
+
+            # Print a message to the screen
+            print("Saved the data for member: ", member, "and model:", model)
+        except Exception as error:
+            print(error)
+            print("Unable to save the data for member: ", member, "and model:", model)
+            sys.exit()
+
+    # Print a message to the screen
+    print('Saved the data for ' + model + ' ' + variable + ' ' + region + ' ' + season + ' ' + forecast_range + ' ' + start_year + ' ' + end_year)
+
+    # Print the time taken
+    print("Time taken to save the data: ", time.time() - start_time, " seconds")
+
+    # Print a message to the screen
+    print('Data processing complete for ' + model + ' ' + variable + ' ' + region + ' ' + season + ' ' + forecast_range + ' ' + start_year + ' ' + end_year)
+
+    # Print the time taken
+    print("Time taken to process the data: ", time.time() - start_time, " seconds")
 
 # Call the main function
 # If we are running this script interactively
