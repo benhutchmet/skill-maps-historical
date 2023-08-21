@@ -263,6 +263,78 @@ def calculate_remove_model_climatology(historical_data_constrained):
     # Return the data
     return historical_data_constrained
 
+# Now define a function to take the seasonal mean by shifting the time axis back (in the case of DJFM) 
+# and then taking the annual mean
+# Or just take the annual mean if the season does not cross the year boundary
+def annual_mean_anoms(historical_data_constrained_anoms, season):
+    """
+    If the season crosses the year boundary then take the seasonal mean by shifting the time axis back.
+    Then take the annual mean.
+    
+    If the season does not cross the year boundary then just take the annual mean.
+    """
+
+    # Print a message to the screen
+    print('Calculating the annual mean anomalies...')
+
+    # if the season crosses the year boundary
+    # i.e. contains December and January ('DJ')
+    if 'D' in season and 'J' in season:
+
+        # Print a message to the screen
+        print('Season crosses the year boundary, so shifting the time axis back')
+
+        # Set up the season from the season timeshift dictionary
+        season_index = [d['season'] for d in dic.season_timeshift].index(season)
+        season = dic.season_timeshift[season_index]
+
+        # Print the season
+        print("season: ", season)
+
+        # Shift the time axis back
+        print("Shifting the time axis back by: ", season['timeshift'])
+
+        # For brevity
+        data = historical_data_constrained_anoms
+
+        try:
+            # Loop over the members
+            for member in data:
+                # Shift the time axis back
+                data[member] = data[member].shift(time=season['timeshift'])
+
+                # Calculate the annual mean
+                data[member] = data[member].resample(time='Y').mean(dim='time')
+
+        except Exception as error:
+            print(error)
+            print("Unable to shift the time axis back and calculate the annual mean for the season: ", season)
+            return None
+
+    else:
+        # Print a message to the screen
+        print('Season does not cross the year boundary')
+
+        # Print that we are just taking the annual mean
+        print('Just taking the annual mean')
+
+        try:
+            # Loop over the members
+            data = historical_data_constrained_anoms
+            for member in data:
+                # Calculate the annual mean
+                data[member] = data[member].resample(time='Y').mean(dim='time')
+
+        except Exception as error:
+            print(error)
+            print("Unable to calculate the annual mean for the season: ", season)
+            return None
+        
+    # Print a message to the screen
+    print('Calculated the annual mean anomalies for the season: ', season)
+
+    # Return the data
+    return data
 
 # Set up the main function for testing purposes
 def main():
