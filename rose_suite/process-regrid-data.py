@@ -430,14 +430,41 @@ def main():
         # Print a message to the screen
         print('Calculated and removed the model climatology...')
 
-        # Print the values of the data
-        print("Values of the data: ", historical_data_constrained_anoms.values)
+        # # Print the values of the data
+        # print("Values of the data: ", historical_data_constrained_anoms.values)
 
         # Print the time taken
         print("Time taken to calculate and remove the model climatology: ", time.time() - start_time, " seconds")
     except Exception as error:
         print(error)
         print("Unable to calculate and remove the model climatology in main...")
+        sys.exit()
+
+    # Calculate the annual mean anomalies
+    try:
+        # Calculate the annual mean anomalies
+        historical_data_constrained_anoms_annual_mean = annual_mean_anoms(historical_data_constrained_anoms, season)
+
+        # Print a message to the screen
+        print('Calculated the annual mean anomalies')
+
+        # Print the data
+        print("Data: ", historical_data_constrained_anoms_annual_mean)
+
+        # loop over the members
+        # and print the psl values
+        data = historical_data_constrained_anoms_annual_mean
+        for member in data:
+            # Print the values of the member
+            print("Values of the member: ", data[member])
+            # print the variant label
+            print("Variant label: ", member)
+
+        # Print the time taken
+        print("Time taken to calculate the annual mean anomalies: ", time.time() - start_time, " seconds")
+    except Exception as error:
+        print(error)
+        print("Unable to calculate the annual mean anomalies in main")
         sys.exit()
 
 # Call the main function
