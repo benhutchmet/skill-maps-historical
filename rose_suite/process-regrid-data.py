@@ -140,6 +140,52 @@ def load_data(model, variable, region):
 
     return historical_data
 
+# Next we want to define a function to select the season and years from the data
+def select_season_years(historical_data, season, start_year, end_year):
+    """
+    Selects the season and years from the data.
+    """
+
+    # Print a message to the screen
+    print('Selecting the season: ' + season + ' and years: ' + start_year + '-' + end_year + '...')
+
+    # Extract the month numbers for the season
+    months = dic.season_months[season]
+
+    # Check the months
+    if len(months) == 0:
+        print("Error, months are empty")
+        return None
+    elif not isinstance(months, list):
+        print("Error, months are not a list")
+        return None
+    elif not all(isinstance(item, int) for item in months):
+        print("Error, months are not all integers")
+        return None
+
+    # Print the months
+    print("months: ", months)
+
+    try:
+        # Loop over the members
+        for member in historical_data:
+            # First select the years
+            historical_data[member] = historical_data[member].sel(time=slice(str(start_year), str(end_year)))
+
+            # Select the months
+            historical_data[member] = historical_data[member].sel(time=historical_data[member]['time.month'].isin(months))
+
+        # print the dimensions of the data for the first member
+        print("Dimensions of the data post processing: ", historical_data.dims)
+
+        # Return the data
+        return historical_data
+    except Exception as Error:
+        print(Error)
+        print("Unable to select the season: " + season + " and years: " + start_year + "-" + end_year + "...")
+        return None
+
+
 
 # Set up the main function for testing purposes
 def main():
@@ -207,6 +253,24 @@ def main():
     except Exception as error:
         print(error)
         print("Unable to load data for " + model + " " + variable + " " + region + " " + season + " " + forecast_range + " " + start_year + " " + end_year + "...")
+        sys.exit()
+
+    # Select the season and years from the data
+    try:
+        # Select the season and years from the data
+        historical_data = select_season_years(historical_data, season, start_year, end_year)
+
+        # Print a message to the screen
+        print('Selected the season: ' + season + ' and years: ' + start_year + '-' + end_year + '...')
+
+        # Print the dimensions of the data
+        print("Dimensions of the data: ", historical_data.dims)
+
+        # Print the time taken
+        print("Time taken to select season and years: ", time.time() - start_time, " seconds")
+    except Exception as error:
+        print(error)
+        print("Unable to select the season: " + season + " and years: " + start_year + "-" + end_year + "...")
         sys.exit()
 
 # Call the main function
