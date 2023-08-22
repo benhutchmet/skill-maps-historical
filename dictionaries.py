@@ -33,6 +33,9 @@ obs_tas = "/home/users/benhutch/ERA5/adaptor.mars.internal-1687448519.6842003-11
 obs_sfcWind = "/home/users/benhutch/ERA5/adaptor.mars.internal-1687448519.6842003-11056-8-3ea80a0a-4964-4995-bc42-7510a92e907b.nc"
 #
 
+# Set up the base directory where the historical data is stored
+base_dir_historical = "/home/users/benhutch/skill-maps-processed-data/historical"
+
 # set up the base path example for the historical runs
 base_path_example = "/badc/cmip6/data/CMIP6/CMIP"
 
@@ -119,7 +122,7 @@ uk_s_box = {
 
 # models = [ "BCC-CSM2-MR", "MPI-ESM1-2-HR", "CanESM5", "CMCC-CM2-SR5", "HadGEM3-GC31-MM", "EC-Earth3", "MPI-ESM1-2-LR", "FGOALS-f3-L", "MIROC6", "IPSL-CM6A-LR", "CESM1-1-CAM5-CMIP5", "NorCPM1" ]
 
-
+# TODO - define lists of models for each of the variables
 # Set up the model_dictionary for the sfcWind historical models
 model_dictionary_sfcWind_historical_badc = [
     {'model_name': 'BCC-CSM2-MR', 'runs': '1-3', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},

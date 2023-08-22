@@ -389,6 +389,20 @@ def call_mergetime_regrid(model_dict, var, region):
 # Define a new function to load the processed historical data
 # This function will take as arguments: the base directory 
 # where the data are stored, the models, the variable name, the region name, the forecast range and the season.
+def load_processed_historical_data(base_dir, models, variable, region, forecast_range, season):
+    """
+    Load the processed historical data from its base directory into a dictionary of datasets.
+
+    Arguments:
+        base_dir -- the base directory where the data are stored
+        models -- the models
+        variable -- the variable name
+        region -- the region name
+        forecast_range -- the forecast range
+
+    Returns:
+        historical_data -- a dictionary of datasets grouped by model and member.
+    """
 
 
 # Now we want to define a function to load the historical data

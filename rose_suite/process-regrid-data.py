@@ -141,6 +141,7 @@ def load_data(model, variable, region):
 
     return historical_data
 
+
 # Next we want to define a function to select the season and years from the data
 def select_season_years(historical_data, season, start_year, end_year):
     """
