@@ -1356,7 +1356,7 @@ def remove_years_with_nans(observed_data, ensemble_mean, variable):
     return observed_data, ensemble_mean
 
 # plot the correlations and p-values
-def plot_correlations(model, rfield, pfield, obs, variable, region, season, forecast_range, plots_dir, obs_lons_converted, lons_converted, azores_grid, iceland_grid, uk_n_box, uk_s_box, experiment=None):
+def plot_correlations(model, rfield, pfield, obs, variable, region, season, forecast_range, plots_dir, obs_lons_converted, lons_converted, azores_grid, iceland_grid, uk_n_box, uk_s_box, experiment=None, observed_data=None):
     """Plot the correlation coefficients and p-values.
     
     This function plots the correlation coefficients and p-values
@@ -1396,6 +1396,8 @@ def plot_correlations(model, rfield, pfield, obs, variable, region, season, fore
         Array of longitudes and latitudes for the southern UK index box.
     experiment : str
         Experiment. Default is None.
+    observed_data : xarray.Dataset
+        Observed data. Default is None.
     """
 
     # Extract the lats and lons for the azores grid
@@ -1500,10 +1502,15 @@ def plot_correlations(model, rfield, pfield, obs, variable, region, season, fore
         print("Error: model name not found")
         sys.exit()
 
-    # Extract the first and last years
-    first_year = obs.time.dt.year.values[0]
-    last_year = obs.time.dt.year.values[-1]
-
+    # if observed_data is not None:
+    #     # Extract the first and last years
+    if observed_data is not None:
+        first_year = observed_data.time.dt.year.values[0]
+        last_year = observed_data.time.dt.year.values[-1]
+    else:
+        first_year = None
+        last_year = None
+        
     # Include the experiment in the title if it is not None
     if experiment is not None:
         # Add title
