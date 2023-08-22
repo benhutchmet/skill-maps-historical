@@ -1356,7 +1356,7 @@ def remove_years_with_nans(observed_data, ensemble_mean, variable):
     return observed_data, ensemble_mean
 
 # plot the correlations and p-values
-def plot_correlations(model, rfield, pfield, obs, variable, region, season, forecast_range, plots_dir, obs_lons_converted, lons_converted, azores_grid, iceland_grid, uk_n_box, uk_s_box):
+def plot_correlations(model, rfield, pfield, obs, variable, region, season, forecast_range, plots_dir, obs_lons_converted, lons_converted, azores_grid, iceland_grid, uk_n_box, uk_s_box, experiment=None):
     """Plot the correlation coefficients and p-values.
     
     This function plots the correlation coefficients and p-values
@@ -1394,6 +1394,8 @@ def plot_correlations(model, rfield, pfield, obs, variable, region, season, fore
         Array of longitudes and latitudes for the northern UK index box.
     uk_s_box : array
         Array of longitudes and latitudes for the southern UK index box.
+    experiment : str
+        Experiment. Default is None.
     """
 
     # Extract the lats and lons for the azores grid
@@ -1498,11 +1500,20 @@ def plot_correlations(model, rfield, pfield, obs, variable, region, season, fore
         print("Error: model name not found")
         sys.exit()
 
-    # Add title
-    plt.title(f"{model} {variable} {region} {season} {forecast_range} Correlation Coefficients")
+    # Include the experiment in the title if it is not None
+    if experiment is not None:
+        # Add title
+        plt.title(f"{model} {variable} {region} {season} {forecast_range} {experiment} Correlation Coefficients")
 
-    # set up the path for saving the figure
-    fig_name = f"{model}_{variable}_{region}_{season}_{forecast_range}_correlation_coefficients_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+        # Set up the figure name
+        fig_name = f"{model}_{variable}_{region}_{season}_{forecast_range}_{experiment}_correlation_coefficients_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+    else:
+        # Add title
+        plt.title(f"{model} {variable} {region} {season} {forecast_range} Correlation Coefficients")
+
+        # Set up the figure name
+        fig_name = f"{model}_{variable}_{region}_{season}_{forecast_range}_correlation_coefficients_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+
     fig_path = os.path.join(plots_dir, fig_name)
 
     # Save the figure

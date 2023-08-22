@@ -835,8 +835,7 @@ def calculate_correlations(observed_data, model_data, obs_lat, obs_lon):
         print(f"Error calculating correlations: {e}")
         sys.exit()
 
-# TODO: Develop a function to calculate the spatial correlations
-# TODO: first developa function which will form the numpy array of members
+# function for processing the model data for plotting
 def process_model_data_for_plot(model_data, models):
     """
     Processes the model data and calculates the ensemble mean.
@@ -1771,7 +1770,6 @@ def regrid_and_select_region(observations_path, region, obs_var_name):
 
     # Check if the output file already exists
     # If it does, then exit the program
-    # BUG: Don't have to redo the processing each time if the file doesn't exist
     if os.path.exists(regrid_sel_region_file):
         print("File already exists")
         print("Loading ERA5 data")
