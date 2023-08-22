@@ -30,6 +30,10 @@ cdo = Cdo()
 # Import the dictionaries
 import dictionaries as dic
 
+# Broad TODOs:
+# TODO: Also create plots of the MSSS and RPC for the MMM and for each model
+# TODO: Quantify the benefit of initialization by comparing the scores between the dcppA-hindcast and historical experiments
+
 # Write a function which uses CDO to merge the time axis of historical files
 # This function takes as arguments, the model name, the variable name, the initialization number, the run number
 # and the path to the directory containing the files
