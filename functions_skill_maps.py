@@ -1274,9 +1274,9 @@ def calculate_correlations(observed_data, model_data, obs_lat, obs_lon):
                 # Calculate the correlation coefficient and p-value
                 r, p = stats.pearsonr(obs, mod)
 
-                # print the correlation coefficient and p-value
-                # print("correlation coefficient", r)
-                # print("p-value", p)
+                # If the correlation coefficient is negative, set the p-value to NaN
+                if r < 0:
+                    p = np.nan
 
                 # Append the correlation coefficient and p-value to the arrays
                 rfield[y, x], pfield[y, x] = r, p
@@ -1356,6 +1356,7 @@ def remove_years_with_nans(observed_data, ensemble_mean, variable):
     return observed_data, ensemble_mean
 
 # plot the correlations and p-values
+# FIXME: only plot hashing where correlations are positive
 def plot_correlations(model, rfield, pfield, obs, variable, region, season, forecast_range, plots_dir, obs_lons_converted, lons_converted, azores_grid, iceland_grid, uk_n_box, uk_s_box, p_sig=0.05, experiment=None, observed_data=None, ensemble_members_count=None):
     """Plot the correlation coefficients and p-values.
     
