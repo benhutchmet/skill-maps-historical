@@ -1011,8 +1011,7 @@ def calculate_spatial_correlations(observed_data, model_data, models, variable):
     # Calculate the correlations between the observed and model data
     rfield, pfield = calculate_correlations(observed_data_array, ensemble_mean_array, obs_lat, obs_lon)
 
-    return rfield, pfield, obs_lons_converted, lons_converted
-
+    return rfield, pfield, obs_lons_converted, lons_converted, observed_data, ensemble_mean
 
 # Now we want to define a function which will constrain the historical data
 # to given years

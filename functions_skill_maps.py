@@ -1232,7 +1232,7 @@ def calculate_spatial_correlations(observed_data, model_data, models, variable):
     # Calculate the correlations between the observed and model data
     rfield, pfield = calculate_correlations(observed_data_array, ensemble_mean_array, obs_lat, obs_lon)
 
-    return rfield, pfield, obs_lons_converted, lons_converted
+    return rfield, pfield, obs_lons_converted, lons_converted, observed_data, ensemble_mean
 
     # except Exception as e:
     #     print(f"An error occurred when calculating spatial correlations: {e}")
@@ -1500,16 +1500,20 @@ def plot_correlations(model, rfield, pfield, obs, variable, region, season, fore
         print("Error: model name not found")
         sys.exit()
 
+    # Extract the first and last years
+    first_year = obs.time.dt.year.values[0]
+    last_year = obs.time.dt.year.values[-1]
+
     # Include the experiment in the title if it is not None
     if experiment is not None:
         # Add title
-        plt.title(f"{model} {variable} {region} {season} {forecast_range} {experiment} Correlation Coefficients")
+        plt.title(f"{model} {variable} {region} {season} {forecast_range} {experiment} {first_year}-{last_year} correlation coefficients", fontsize=12)
 
         # Set up the figure name
         fig_name = f"{model}_{variable}_{region}_{season}_{forecast_range}_{experiment}_correlation_coefficients_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
     else:
         # Add title
-        plt.title(f"{model} {variable} {region} {season} {forecast_range} Correlation Coefficients")
+        plt.title(f"{model} {variable} {region} {season} {forecast_range} {first_year}-{last_year} correlation coefficients", fontsize=12)
 
         # Set up the figure name
         fig_name = f"{model}_{variable}_{region}_{season}_{forecast_range}_correlation_coefficients_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
