@@ -385,7 +385,8 @@ def call_mergetime_regrid(model_dict, var, region):
                 if regridded_file is None:
                     print("Error, regridded file does not exist")
 
-
+# TODO - write a function to load the processed historical data
+# TODO - test the function
 # Define a new function to load the processed historical data
 # This function will take as arguments: the base directory 
 # where the data are stored, the models, the variable name, the region name, the forecast range and the season.
@@ -404,6 +405,52 @@ def load_processed_historical_data(base_dir, models, variable, region, forecast_
         historical_data -- a dictionary of datasets grouped by model and member.
     """
 
+    # Initialize the dictionary to store the data
+    historical_data = {}
+
+    # Loop over the models
+    for model in models:
+            
+        # Print the model name
+        print("processing model: ", model)
+
+        # Create an empty list to store the datasets
+        # within the dictionary
+        historical_data[model] = []
+
+        # Set up the file path for the model
+        # First the directory path
+        # base_dir = "/home/users/benhutch/skill-maps-processed-data/historical"
+        files_path = base_dir + '/' + variable + '/' + model + '/' + region + '/' + 'years_' + forecast_range + '/' + season + '/' + 'outputs' + '/' + 'processed' + '/' + '*.nc'
+
+        # Print the files path
+        print("files_path: ", files_path)
+
+        # Find the files which match the path
+        files = glob.glob(files_path)
+
+        # If the list of files is empty, then print a warning and exit
+        if len(files) == 0:
+            print("Warning, no files found for model: ", model)
+            return None
+
+        # Loop over the files
+        for file in files:
+            # Open the dataset using xarray
+            data = xr.open_dataset(file, chunks={'time': 100, 'lat': 45, 'lon': 45})
+
+            # Extract the variant_label
+            variant_label = data.attrs['variant_label']
+
+            # Print the variant_label
+            print("loading variant_label: ", variant_label)
+
+            # Add the data to the dictionary
+            # Using the variant_label as the key
+            historical_data[model].append(data)
+
+    # Return the historical data dictionary
+    return historical_data    
 
 # Now we want to define a function to load the historical data
 # As a dictionary of xarray datasets for each model
