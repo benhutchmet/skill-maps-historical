@@ -520,10 +520,16 @@ def extract_historical_data(historical_data, variable):
             # Print the member name
             print("processing member: ", member)
 
+            # print the type of the historical data
+            print("type of historical_data: ", type(member))
+
+            # print the dimensions of the historical data
+            print("dimensions of historical_data: ", member.dims)
+
             # Format as a try except block    
             try:
                 # Process the historical data
-                variable_data, historical_time = process_historical_members(historical_data[model][member], variable)
+                variable_data, historical_time = process_historical_members(member, variable)
 
                 # Append the data to the list
                 variable_data_by_model[model].append(variable_data)
