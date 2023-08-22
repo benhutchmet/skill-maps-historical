@@ -1356,7 +1356,7 @@ def remove_years_with_nans(observed_data, ensemble_mean, variable):
     return observed_data, ensemble_mean
 
 # plot the correlations and p-values
-def plot_correlations(model, rfield, pfield, obs, variable, region, season, forecast_range, plots_dir, obs_lons_converted, lons_converted, azores_grid, iceland_grid, uk_n_box, uk_s_box, experiment=None, observed_data=None):
+def plot_correlations(model, rfield, pfield, obs, variable, region, season, forecast_range, plots_dir, obs_lons_converted, lons_converted, azores_grid, iceland_grid, uk_n_box, uk_s_box, p_sig=0.05, experiment=None, observed_data=None, ensemble_members_count=None):
     """Plot the correlation coefficients and p-values.
     
     This function plots the correlation coefficients and p-values
@@ -1394,10 +1394,14 @@ def plot_correlations(model, rfield, pfield, obs, variable, region, season, fore
         Array of longitudes and latitudes for the northern UK index box.
     uk_s_box : array
         Array of longitudes and latitudes for the southern UK index box.
+    p_sig : float
+        P-value for statistical significance. Default is 0.05.
     experiment : str
         Experiment. Default is None.
     observed_data : xarray.Dataset
         Observed data. Default is None.
+    ensemble_members_count : dict
+        Dictionary of the number of ensemble members for each model. Default is None.
     """
 
     # Extract the lats and lons for the azores grid
@@ -1511,19 +1515,27 @@ def plot_correlations(model, rfield, pfield, obs, variable, region, season, fore
         first_year = None
         last_year = None
 
+    # Set up the significance threshold
+    # if p_sig is 0.05, then sig_threshold is 95%
+    sig_threshold = int((1 - p_sig) * 100)
+
+    # If ensemble_members_count is not None
+    if ensemble_members_count is not None:
+        total_no_members = sum(ensemble_members_count.values())
+
     # Include the experiment in the title if it is not None
     if experiment is not None:
         # Add title
-        plt.title(f"{model} {variable} {region} {season} {forecast_range} {experiment} {first_year}-{last_year} correlation coefficients", fontsize=12)
+        plt.title(f"{model} {variable} {region} {season} {forecast_range} {experiment} {first_year}-{last_year} correlation coefficients, p < {p_sig} ({sig_threshold}%), N = {total_no_members}", fontsize=12)
 
         # Set up the figure name
-        fig_name = f"{model}_{variable}_{region}_{season}_{forecast_range}_{experiment}_correlation_coefficients_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+        fig_name = f"{model}_{variable}_{region}_{season}_{forecast_range}_{experiment}_{total_no_members}_{p_sig}_correlation_coefficients_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
     else:
         # Add title
-        plt.title(f"{model} {variable} {region} {season} {forecast_range} {first_year}-{last_year} correlation coefficients", fontsize=12)
+        plt.title(f"{model} {variable} {region} {season} {forecast_range} {first_year}-{last_year} correlation coefficients, p < {p_sig} ({sig_threshold}%), N = {total_no_members}", fontsize=12)
 
         # Set up the figure name
-        fig_name = f"{model}_{variable}_{region}_{season}_{forecast_range}_correlation_coefficients_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+        fig_name = f"{model}_{variable}_{region}_{season}_{forecast_range}_{total_no_members}_{p_sig}_correlation_coefficients_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
 
     fig_path = os.path.join(plots_dir, fig_name)
 
