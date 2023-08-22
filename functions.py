@@ -451,7 +451,91 @@ def load_processed_historical_data(base_dir, models, variable, region, forecast_
     # Return the historical data dictionary
     return historical_data
 
-# TODO: Develop a function to process the historical data    
+# Set up a function which which given the dataset and variable
+# will extract the data for the given variable and the time dimension
+def process_historical_members(model_member, variable):
+    """
+    For a given model member, extract the data for the given variable and the time dimension.
+    """
+    
+    # Print the variable name
+    print("processing variable: ", variable)
+
+    # Check that the variable name is valid
+    if variable not in dic.variables:
+        print("Error, variable name not valid")
+        return None
+
+    try:
+        # Extract the data for the given variable
+        variable_data = model_member[variable]
+    except Exception as error:
+        print(error)
+        print("Error, failed to extract data for variable: ", variable)
+        return None
+    
+    # Extract the time dimension
+    try:
+        # Extract the time dimension
+        historical_time = model_member["time"].values
+
+        # Change these to a year format
+        # BUG: Check whether + 1970 is needed when run
+        historical_time = historical_time.astype('datetime64[Y]').astype(int) + 1970
+    except Exception as error:
+        print(error)
+        print("Error, failed to extract time dimension")
+        return None
+    
+    # If either the variable data or the time dimension are None
+    # then return None
+    if variable_data is None or historical_time is None:
+        print("Error, variable data or time dimension is None")
+        sys.exit(1)
+
+    return variable_data, historical_time
+
+# Now write the outer function which will call this inner function
+def extract_historical_data(historical_data, variable):
+    """
+    Outer function to process the historical data by extracting the data 
+    for the given variable and the time dimension.
+    """
+
+    # Create empty dictionaries to store the data
+    variable_data_by_model = {}
+    historical_time_by_model = {}
+
+    # Loop over the models
+    for model in historical_data:
+        # Print the model name
+        print("processing model: ", model)
+
+        # Create empty lists to store the data
+        variable_data_by_model[model] = []
+        historical_time_by_model[model] = []
+
+        # Loop over the members
+        for member in historical_data[model]:
+            # Print the member name
+            print("processing member: ", member)
+
+            # Format as a try except block    
+            try:
+                # Process the historical data
+                variable_data, historical_time = process_historical_members(historical_data[model][member], variable)
+
+                # Append the data to the list
+                variable_data_by_model[model].append(variable_data)
+                historical_time_by_model[model].append(historical_time)
+            except Exception as error:
+                print(error)
+                print("Error, failed to process historical data using process_historical_members in outer function")
+                return None
+            
+    # Return the data
+    return variable_data_by_model, historical_time_by_model
+
 
 # Now we want to define a function to load the historical data
 # As a dictionary of xarray datasets for each model

@@ -1,7 +1,7 @@
 [cylc]
     UTC mode = True # Ignore DST
     [[parameters]]
-        model=1,2,3,4,5,6,7,8,9,10,12
+        model=9
         initial_year=1960
         final_year=2019
         variable="psl"
@@ -38,5 +38,5 @@
         python process-regrid-data.py ${CYLC_TASK_PARAM_model} ${CYLC_TASK_PARAM_variable} ${CYLC_TASK_PARAM_region} ${CYLC_TASK_PARAM_season} ${CYLC_TASK_PARAM_forecast_range} ${CYLC_TASK_PARAM_initial_year} ${CYLC_TASK_PARAM_final_year}
         """
         [[[job]]]
-            execution time limit = PT20M
+            execution time limit = PT30M
         
