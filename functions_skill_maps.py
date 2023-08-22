@@ -1535,7 +1535,7 @@ def plot_correlations(model, rfield, pfield, obs, variable, region, season, fore
 
 # Function for plotting the results for all of the models as 12 subplots
 # TODO: Modify this function so that it works for the different historical cases
-def plot_correlations_subplots(models, obs, variable_data, variable, region, season, forecast_range, plots_dir, azores_grid, iceland_grid, uk_n_box, uk_s_box, p_sig = 0.05):
+def plot_correlations_subplots(models, obs, variable_data, variable, region, season, forecast_range, plots_dir, azores_grid, iceland_grid, uk_n_box, uk_s_box, p_sig = 0.05, experiment=None, observed_data=None):
     """Plot the spatial correlation coefficients and p-values for all models.
 
     This function plots the spatial correlation coefficients and p-values
@@ -1568,6 +1568,10 @@ def plot_correlations_subplots(models, obs, variable_data, variable, region, sea
         Array of longitudes and latitudes for the southern UK index box.
     p_sig : float, optional
         Significance threshold. The default is 0.05.
+    experiment : str, optional
+        Experiment. The default is None.
+    observed_data : xarray.Dataset, optional
+        Observed data. The default is None.
     """
 
     # Set the font size for the plots
@@ -1575,6 +1579,14 @@ def plot_correlations_subplots(models, obs, variable_data, variable, region, sea
 
     # Set the projection
     proj = ccrs.PlateCarree()
+
+    # Set up the first and last years
+    if observed_data is not None:
+        first_year = observed_data.time.dt.year.values[0]
+        last_year = observed_data.time.dt.year.values[-1]
+    else:
+        first_year = None
+        last_year = None
     
     # Set up the lats and lons for the azores grid
     azores_lon1, azores_lon2 = azores_grid['lon1'], azores_grid['lon2']
@@ -1725,7 +1737,7 @@ def plot_correlations_subplots(models, obs, variable_data, variable, region, sea
         # If this is the centre subplot on the first row, set the title for the figure
         if i == title_index:
             # Add title
-            ax.set_title(f"{variable} {region} {season} years {forecast_range} Correlation Coefficients, p < {p_sig} ({sig_threshold}%)", fontsize=12)
+            ax.set_title(f"{variable} {region} {season} years {forecast_range} {experiment} {first_year}-{last_year} correlation coefficients, p < {p_sig} ({sig_threshold}%)", fontsize=12)
     
     # Create a single colorbar for all of the subplots
     cbar = plt.colorbar(cf_list[0], orientation='horizontal', pad=0.05, aspect=50, ax=fig.axes, shrink=0.8)
@@ -1734,8 +1746,14 @@ def plot_correlations_subplots(models, obs, variable_data, variable, region, sea
     # Specify a tight layout
     # plt.tight_layout()
 
-    # set up the path for saving the figure
-    fig_name = f"{variable}_{region}_{season}_{forecast_range}_sig-{p_sig}_correlation_coefficients_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+    # if experiment is not None:
+    if experiment is not None:
+        fig_name = f"{variable}_{region}_{season}_{forecast_range}_{experiment}_{first_year}-{last_year}_sig-{p_sig}_correlation_coefficients_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+    else:
+        # set up the path for saving the figure
+        fig_name = f"{variable}_{region}_{season}_{forecast_range}_{first_year}_{last_year}_sig-{p_sig}_correlation_coefficients_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+
+    # Set up the figure path
     fig_path = os.path.join(plots_dir, fig_name)
 
     # # Adjust the vertical spacing between the plots
