@@ -912,7 +912,7 @@ def process_model_data_for_plot(model_data, models):
     # Convert ensemble_mean to an xarray DataArray
     ensemble_mean = xr.DataArray(ensemble_mean, coords=member.coords, dims=member.dims)
 
-    return ensemble_mean, lat, lon, years
+    return ensemble_mean, lat, lon, years, ensemble_members_count
 
 # Function for calculating the spatial correlations
 def calculate_spatial_correlations(observed_data, model_data, models, variable):
@@ -930,7 +930,7 @@ def calculate_spatial_correlations(observed_data, model_data, models, variable):
     """
     # try:
     # Process the model data and calculate the ensemble mean
-    ensemble_mean, lat, lon, years = process_model_data_for_plot(model_data, models)
+    ensemble_mean, lat, lon, years, ensemble_members_count = process_model_data_for_plot(model_data, models)
 
     # Debug the model data
     # print("ensemble mean within spatial correlation function:", ensemble_mean)
@@ -1011,7 +1011,7 @@ def calculate_spatial_correlations(observed_data, model_data, models, variable):
     # Calculate the correlations between the observed and model data
     rfield, pfield = calculate_correlations(observed_data_array, ensemble_mean_array, obs_lat, obs_lon)
 
-    return rfield, pfield, obs_lons_converted, lons_converted, observed_data, ensemble_mean
+    return rfield, pfield, obs_lons_converted, lons_converted, observed_data, ensemble_mean, ensemble_members_count
 
 # Now we want to define a function which will constrain the historical data
 # to given years
