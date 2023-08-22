@@ -480,7 +480,6 @@ def process_historical_members(model_member, variable):
         historical_time = model_member["time"].values
 
         # Change these to a year format
-        # BUG: Check whether + 1970 is needed when run
         historical_time = historical_time.astype('datetime64[Y]').astype(int) + 1970
     except Exception as error:
         print(error)
@@ -622,7 +621,387 @@ def load_historical_data(model_dict, var, region):
 
     # Return the historical data dictionary
     return historical_data
+
+# Function to constrain the years of the historical data
+# Define a function to constrain the years to the years that are in all of the model members
+def constrain_years_processed_hist(model_data, models):
+    """
+    Constrains the years to the years that are in all of the models.
+
+    Parameters:
+    model_data (dict): The processed model data.
+    models (list): The list of models to be plotted.
+
+    Returns:
+    constrained_data (dict): The model data with years constrained to the years that are in all of the models.
+    """
+    # Initialize a list to store the years for each model
+    years_list = []
+
+    # Print the models being proces
+    # print("models:", models)
+    
+    # Loop over the models
+    for model in models:
+        # Extract the model data
+        model_data_combined = model_data[model]
+
+        # Loop over the ensemble members in the model data
+        for member in model_data_combined:
+            # Extract the years
+            years = member.time.dt.year.values
+
+            # Append the years to the list of years
+            years_list.append(years)
+
+    # Find the years that are in all of the models
+    common_years = list(set(years_list[0]).intersection(*years_list))
+
+    # Print the common years for debugging
+    # print("Common years:", common_years)
+    # print("Common years type:", type(common_years))
+    # print("Common years shape:", np.shape(common_years))
+
+    # Initialize a dictionary to store the constrained data
+    constrained_data = {}
+
+    # Loop over the models
+    for model in models:
+        # Extract the model data
+        model_data_combined = model_data[model]
+
+        # Loop over the ensemble members in the model data
+        for member in model_data_combined:
+            # Extract the years
+            years = member.time.dt.year.values
+
+            # Print the years extracted from the model
+            # print('model years', years)
+            # print('model years shape', np.shape(years))
             
+            # Find the years that are in both the model data and the common years
+            years_in_both = np.intersect1d(years, common_years)
+
+            # print("years in both shape", np.shape(years_in_both))
+            # print("years in both", years_in_both)
+            
+            # Select only those years from the model data
+            member = member.sel(time=member.time.dt.year.isin(years_in_both))
+
+            # Add the member to the constrained data dictionary
+            if model not in constrained_data:
+                constrained_data[model] = []
+            constrained_data[model].append(member)
+
+    # # Print the constrained data for debugging
+    # print("Constrained data:", constrained_data)
+
+    return constrained_data
+
+# Function to remove years with Nans
+# checking for Nans in observed data
+def remove_years_with_nans(observed_data, ensemble_mean, variable):
+    """
+    Removes years from the observed data that contain NaN values.
+
+    Args:
+        observed_data (xarray.Dataset): The observed data.
+        ensemble_mean (xarray.Dataset): The ensemble mean (model data).
+        variable (str): the variable name.
+
+    Returns:
+        xarray.Dataset: The observed data with years containing NaN values removed.
+    """
+
+    # # Set the obs_var_name == variable
+    obs_var_name = variable
+
+    # Set up the obs_var_name
+    if obs_var_name == "psl":
+        obs_var_name = "msl"
+    elif obs_var_name == "tas":
+        obs_var_name = "t2m"
+    elif obs_var_name == "sfcWind":
+        obs_var_name = "si10"
+    elif obs_var_name == "rsds":
+        obs_var_name = "ssrd"
+    elif obs_var_name == "tos":
+        obs_var_name = "sst"
+    else:
+        print("Invalid variable name")
+        sys.exit()
+
+    print("var name for obs", obs_var_name)
+    
+    for year in observed_data.time.dt.year.values[::-1]:
+        # Extract the data for the year
+        data = observed_data.sel(time=f"{year}")
+
+        
+        # If there are any Nan values in the data
+        if np.isnan(data.values).any():
+            # Print the year
+            # print(year)
+
+            # Select the year from the observed data
+            observed_data = observed_data.sel(time=observed_data.time.dt.year != year)
+
+            # for the model data
+            ensemble_mean = ensemble_mean.sel(time=ensemble_mean.time.dt.year != year)
+
+        # if there are no Nan values in the data for a year
+        # then print the year
+        # and "no nan for this year"
+        # and continue the script
+        else:
+            # print(year, "no nan for this year")
+
+            # exit the loop
+            break
+
+    return observed_data, ensemble_mean
+
+# Function for calculating the spatial correlations
+def calculate_correlations(observed_data, model_data, obs_lat, obs_lon):
+    """
+    Calculates the spatial correlations between the observed and model data.
+
+    Parameters:
+    observed_data (numpy.ndarray): The processed observed data.
+    model_data (numpy.ndarray): The processed model data.
+    obs_lat (numpy.ndarray): The latitude values of the observed data.
+    obs_lon (numpy.ndarray): The longitude values of the observed data.
+
+    Returns:
+    rfield (xarray.core.dataarray.DataArray): The spatial correlations between the observed and model data.
+    pfield (xarray.core.dataarray.DataArray): The p-values for the spatial correlations between the observed and model data.
+    """
+    try:
+        # Initialize empty arrays for the spatial correlations and p-values
+        rfield = np.empty([len(obs_lat), len(obs_lon)])
+        pfield = np.empty([len(obs_lat), len(obs_lon)])
+
+        # Print the dimensions of the observed and model data
+        print("observed data shape", np.shape(observed_data))
+        print("model data shape", np.shape(model_data))
+
+        # Print the type of the observed and model data
+        print("observed data type", type(observed_data))
+        print("model data type", type(model_data))
+
+        # Loop over the latitudes and longitudes
+        for y in range(len(obs_lat)):
+            for x in range(len(obs_lon)):
+                # set up the obs and model data
+                obs = observed_data[:, y, x]
+                mod = model_data[:, y, x]
+
+                # print the obs and model data
+                # print("observed data", obs)
+                # print("model data", mod)
+
+                # Calculate the correlation coefficient and p-value
+                r, p = stats.pearsonr(obs, mod)
+
+                # print the correlation coefficient and p-value
+                # print("correlation coefficient", r)
+                # print("p-value", p)
+
+                # Append the correlation coefficient and p-value to the arrays
+                rfield[y, x], pfield[y, x] = r, p
+
+        # Print the range of the correlation coefficients and p-values
+        # to 3 decimal places
+        print(f"Correlation coefficients range from {rfield.min():.3f} to {rfield.max():.3f}")
+        print(f"P-values range from {pfield.min():.3f} to {pfield.max():.3f}")
+
+        # Return the correlation coefficients and p-values
+        return rfield, pfield
+
+    except Exception as e:
+        print(f"Error calculating correlations: {e}")
+        sys.exit()
+
+# TODO: Develop a function to calculate the spatial correlations
+# TODO: first developa function which will form the numpy array of members
+def process_model_data_for_plot(model_data, models):
+    """
+    Processes the model data and calculates the ensemble mean.
+
+    Parameters:
+    model_data (dict): The processed model data.
+    models (list): The list of models to be plotted.
+
+    Returns:
+    ensemble_mean (xarray.core.dataarray.DataArray): The equally weighted ensemble mean of the ensemble members.
+    """
+    # Initialize a list for the ensemble members
+    ensemble_members = []
+
+    # Initialize a dictionary to store the number of ensemble members
+    ensemble_members_count = {}
+
+    # First constrain the years to the years that are in all of the models
+    model_data = constrain_years_processed_hist(model_data, models)
+
+    # Loop over the models
+    for model in models:
+        # Extract the model data
+        model_data_combined = model_data[model]
+
+        # Print
+        print("extracting data for model:", model)
+
+        # Set the ensemble members count to zero
+        # if the model is not in the ensemble members count dictionary
+        if model not in ensemble_members_count:
+            ensemble_members_count[model] = 0
+        
+        # Loop over the ensemble members in the model data
+        for member in model_data_combined:
+            # Append the ensemble member to the list of ensemble members
+            ensemble_members.append(member)
+
+            # Try to print values for each member
+            # print("trying to print values for each member for debugging")
+            # print("values for model:", model)
+            # print("values for members:", member)
+            # print("member values:", member.values)
+
+            # Extract the lat and lon values
+            lat = member.lat.values
+            lon = member.lon.values
+
+            # Extract the years
+            years = member.time.dt.year.values
+
+            # Print statements for debugging
+            # print('shape of years', np.shape(years))
+            # # print('years', years)
+
+            # Increment the count of ensemble members for the model
+            ensemble_members_count[model] += 1
+
+    # Convert the list of all ensemble members to a numpy array
+    ensemble_members = np.array(ensemble_members)
+
+    # Print the dimensions of the ensemble members
+    # print("ensemble members shape", np.shape(ensemble_members))
+
+
+    # Take the equally weighted ensemble mean
+    ensemble_mean = ensemble_members.mean(axis=0)
+
+    # Print the dimensions of the ensemble mean
+    # print(np.shape(ensemble_mean))
+    # print(type(ensemble_mean))
+    # print(ensemble_mean)
+        
+    # Convert ensemble_mean to an xarray DataArray
+    ensemble_mean = xr.DataArray(ensemble_mean, coords=member.coords, dims=member.dims)
+
+    return ensemble_mean, lat, lon, years
+
+# Function for calculating the spatial correlations
+def calculate_spatial_correlations(observed_data, model_data, models, variable):
+    """
+    Ensures that the observed and model data have the same dimensions, format and shape. Before calculating the spatial correlations between the two datasets.
+    
+    Parameters:
+    observed_data (xarray.core.dataset.Dataset): The processed observed data.
+    model_data (dict): The processed model data.
+    models (list): The list of models to be plotted.
+
+    Returns:
+    rfield (xarray.core.dataarray.DataArray): The spatial correlations between the observed and model data.
+    pfield (xarray.core.dataarray.DataArray): The p-values for the spatial correlations between the observed and model data.
+    """
+    # try:
+    # Process the model data and calculate the ensemble mean
+    ensemble_mean, lat, lon, years = process_model_data_for_plot(model_data, models)
+
+    # Debug the model data
+    # print("ensemble mean within spatial correlation function:", ensemble_mean)
+    # print("shape of ensemble mean within spatial correlation function:", np.shape(ensemble_mean))
+    
+    # Extract the lat and lon values
+    obs_lat = observed_data.lat.values
+    obs_lon = observed_data.lon.values
+    # And the years
+    obs_years = observed_data.time.dt.year.values
+
+    # Initialize lists for the converted lons
+    obs_lons_converted, lons_converted = [], []
+
+    # Transform the obs lons
+    obs_lons_converted = np.where(obs_lon > 180, obs_lon - 360, obs_lon)
+    # add 180 to the obs_lons_converted
+    obs_lons_converted = obs_lons_converted + 180
+
+    # For the model lons
+    lons_converted = np.where(lon > 180, lon - 360, lon)
+    # # add 180 to the lons_converted
+    lons_converted = lons_converted + 180
+
+    # Print the observed and model years
+    # print('observed years', obs_years)
+    # print('model years', years)
+    
+    # Find the years that are in both the observed and model data
+    years_in_both = np.intersect1d(obs_years, years)
+
+    # print('years in both', years_in_both)
+
+    # Select only the years that are in both the observed and model data
+    observed_data = observed_data.sel(time=observed_data.time.dt.year.isin(years_in_both))
+    ensemble_mean = ensemble_mean.sel(time=ensemble_mean.time.dt.year.isin(years_in_both))
+
+    # Remove years with NaNs
+    observed_data, ensemble_mean = remove_years_with_nans(observed_data, ensemble_mean, variable)
+
+    # Print the ensemble mean values
+    # print("ensemble mean value after removing nans:", ensemble_mean.values)
+
+    # # set the obs_var_name
+    # obs_var_name = variable
+    
+    # # choose the variable name for the observed data
+    # # Translate the variable name to the name used in the obs dataset
+    # if obs_var_name == "psl":
+    #     obs_var_name = "msl"
+    # elif obs_var_name == "tas":
+    #     obs_var_name = "t2m"
+    # elif obs_var_name == "sfcWind":
+    #     obs_var_name = "si10"
+    # elif obs_var_name == "rsds":
+    #     obs_var_name = "ssrd"
+    # elif obs_var_name == "tos":
+    #     obs_var_name = "sst"
+    # else:
+    #     print("Invalid variable name")
+    #     sys.exit()
+
+    # variable extracted already
+    # Convert both the observed and model data to numpy arrays
+    observed_data_array = observed_data.values / 100
+    ensemble_mean_array = ensemble_mean.values / 100
+
+    # Print the values and shapes of the observed and model data
+    # print("observed data shape", np.shape(observed_data_array))
+    # print("model data shape", np.shape(ensemble_mean_array))
+    # print("observed data", observed_data_array)
+    # print("model data", ensemble_mean_array)
+
+    # Check that the observed data and ensemble mean have the same shape
+    if observed_data_array.shape != ensemble_mean_array.shape:
+        raise ValueError("Observed data and ensemble mean must have the same shape.")
+
+    # Calculate the correlations between the observed and model data
+    rfield, pfield = calculate_correlations(observed_data_array, ensemble_mean_array, obs_lat, obs_lon)
+
+    return rfield, pfield, obs_lons_converted, lons_converted
+
+
 # Now we want to define a function which will constrain the historical data
 # to given years
 # this function takes as arguments: the historical data dictionary, the start year and the end year, the season, the model and the member index
@@ -1412,7 +1791,7 @@ def regrid_and_select_region(observations_path, region, obs_var_name):
     # for the provided variable
     try:
         # Load the dataset for the selected variable
-        regrid_sel_region_dataset = xr.open_mfdataset(regrid_sel_region_file, combine='by_coords', chunks={"time": 50})[obs_var_name]
+        regrid_sel_region_dataset = xr.open_mfdataset(regrid_sel_region_file, combine='by_coords', chunks={"time": 100, 'lat': 100, 'lon': 100})[obs_var_name]
 
         # Combine the two expver variables
         regrid_sel_region_dataset_combine = regrid_sel_region_dataset.sel(expver=1).combine_first(regrid_sel_region_dataset.sel(expver=5))
