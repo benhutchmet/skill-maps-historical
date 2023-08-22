@@ -385,7 +385,7 @@ def call_mergetime_regrid(model_dict, var, region):
                 if regridded_file is None:
                     print("Error, regridded file does not exist")
 
-# TODO - test the function
+
 # Define a new function to load the processed historical data
 # This function will take as arguments: the base directory 
 # where the data are stored, the models, the variable name, the region name, the forecast range and the season.
@@ -449,7 +449,9 @@ def load_processed_historical_data(base_dir, models, variable, region, forecast_
             historical_data[model].append(data)
 
     # Return the historical data dictionary
-    return historical_data    
+    return historical_data
+
+# TODO: Develop a function to process the historical data    
 
 # Now we want to define a function to load the historical data
 # As a dictionary of xarray datasets for each model
