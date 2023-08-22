@@ -1,13 +1,13 @@
 [cylc]
     UTC mode = True # Ignore DST
     [[parameters]]
-        model=9
+        model=1,2,3,4,5,6,7,8,9,10,12
         initial_year=1960
         final_year=2019
         variable="psl"
         region="global"
         forecast_range="2-9"
-        season="JJA"
+        season="SON"
 
 [scheduling]
     [[dependencies]]
