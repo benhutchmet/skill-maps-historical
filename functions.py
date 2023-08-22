@@ -1774,10 +1774,13 @@ def regrid_and_select_region(observations_path, region, obs_var_name):
     # BUG: Don't have to redo the processing each time if the file doesn't exist
     if os.path.exists(regrid_sel_region_file):
         print("File already exists")
-        # sys.exit()
+        print("Loading ERA5 data")
+    else:
+        print("File does not exist")
+        print("Processing ERA5 data using CDO")
 
-    # Regrid and select the region using cdo 
-    cdo.remapbil(gridspec, input=observations_path, output=regrid_sel_region_file)
+        # Regrid and select the region using cdo 
+        cdo.remapbil(gridspec, input=observations_path, output=regrid_sel_region_file)
 
     # Load the regridded and selected region dataset
     # for the provided variable
@@ -1805,7 +1808,7 @@ def regrid_and_select_region(observations_path, region, obs_var_name):
     # for the provided variable
     try:
         # Load the dataset for the selected variable
-        regrid_sel_region_dataset = xr.open_mfdataset(regrid_sel_region_file, combine='by_coords', chunks={"time": 100, 'lat': 100, 'lon': 100})[obs_var_name]
+        regrid_sel_region_dataset = xr.open_mfdataset(regrid_sel_region_file, combine='by_coords', parallel=True, chunks={"time": 100, 'lat': 100, 'lon': 100})[obs_var_name]
 
         # Combine the two expver variables
         regrid_sel_region_dataset_combine = regrid_sel_region_dataset.sel(expver=1).combine_first(regrid_sel_region_dataset.sel(expver=5))
