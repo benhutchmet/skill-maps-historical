@@ -137,6 +137,7 @@ model_dictionary_sfcWind_historical_badc = [
 ]
 
 # set up the numbers for the sfcWind historical models
+# 10 models
 model_dictionary_sfcWind_historical_badc_numbers = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10 ]
 
 # Define the sfcWind models list
@@ -163,6 +164,7 @@ model_dictionary_psl_historical_badc = [
 model_dictionary_psl_historical_badc_numbers = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12 ]
 
 # Define the psl models list
+# 10 models
 psl_models = [ "BCC-CSM2-MR", "MPI-ESM1-2-HR", "CanESM5", "CMCC-CM2-SR5", "HadGEM3-GC31-MM", "MPI-ESM1-2-LR", "FGOALS-f3-L", "MIROC6", "IPSL-CM6A-LR", "NorCPM1" ]
 
 # models = [ "BCC-CSM2-MR", "MPI-ESM1-2-HR", "CanESM5", "CMCC-CM2-SR5", "HadGEM3-GC31-MM", "EC-Earth3", "MPI-ESM1-2-LR", "FGOALS-f3-L", "MIROC6", "IPSL-CM6A-LR", "CESM1-1-CAM5-CMIP5", "NorCPM1" ]
@@ -186,6 +188,7 @@ model_dictionary_tas_historical_badc = [
 model_dictionary_tas_historical_badc_numbers = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12 ]
 
 # Define the tas models list
+# 11 models
 tas_models = [ "BCC-CSM2-MR", "MPI-ESM1-2-HR", "CanESM5", "CMCC-CM2-SR5", "HadGEM3-GC31-MM", "EC-Earth3", "MPI-ESM1-2-LR", "FGOALS-f3-L", "MIROC6", "IPSL-CM6A-LR", "NorCPM1" ]
 
 # models = [ "BCC-CSM2-MR", "MPI-ESM1-2-HR", "CanESM5", "CMCC-CM2-SR5", "HadGEM3-GC31-MM", "EC-Earth3", "MPI-ESM1-2-LR", "FGOALS-f3-L", "MIROC6", "IPSL-CM6A-LR", "CESM1-1-CAM5-CMIP5", "NorCPM1" ]
@@ -209,6 +212,7 @@ model_dictionary_rsds_historical_badc = [
 model_dictionary_rsds_historical_badc_numbers = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12 ]
 
 # Set up the rsds models list
+# 11 models
 rsds_models = [ "BCC-CSM2-MR", "MPI-ESM1-2-HR", "CanESM5", "CMCC-CM2-SR5", "HadGEM3-GC31-MM", "EC-Earth3", "MPI-ESM1-2-LR", "FGOALS-f3-L", "MIROC6", "IPSL-CM6A-LR", "NorCPM1" ]
 
 # Create a list of the model dictionaries
