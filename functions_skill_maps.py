@@ -1740,6 +1740,11 @@ def plot_correlations_subplots(models, obs, variable_data, variable, region, sea
     
         # Add textbox with model name
         ax.text(0.05, 0.95, model, transform=ax.transAxes, fontsize=12, fontweight='bold', va='top', bbox=dict(facecolor='white', alpha=0.5))
+
+        # Add a textbook with the number of ensemble members
+        total_no_members = sum(ensemble_members_count.values())
+        # Include this textbox in the bottom right corner
+        ax.text(0.95, 0.05, f"N = {total_no_members}", transform=ax.transAxes, fontsize=12, fontweight='bold', va='bottom', ha='right', bbox=dict(facecolor='white', alpha=0.5))
     
         # Add the contourf object to the list
         cf_list.append(cf)
