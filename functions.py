@@ -648,8 +648,15 @@ def constrain_years_processed_hist(model_data, models):
 
         # Loop over the ensemble members in the model data
         for member in model_data_combined:
+            
             # Extract the years
             years = member.time.dt.year.values
+
+            # If years is less than 48, then don't use this member
+            if len(years) < 48:
+                print("years less than 48")
+                print("not including this member in common years for this model: ", model)
+                continue
 
             # Append the years to the list of years
             years_list.append(years)
@@ -678,6 +685,12 @@ def constrain_years_processed_hist(model_data, models):
             # Print the years extracted from the model
             # print('model years', years)
             # print('model years shape', np.shape(years))
+
+            # If years is less than 48, then don't use this member
+            if len(years) < 48:
+                print("years less than 48")
+                print("not using this member for this model: ", model)
+                continue
             
             # Find the years that are in both the model data and the common years
             years_in_both = np.intersect1d(years, common_years)
@@ -1758,6 +1771,7 @@ def regrid_and_select_region(observations_path, region, obs_var_name):
 
     # Check if the output file already exists
     # If it does, then exit the program
+    # BUG: Don't have to redo the processing each time if the file doesn't exist
     if os.path.exists(regrid_sel_region_file):
         print("File already exists")
         # sys.exit()
