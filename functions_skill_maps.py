@@ -1535,7 +1535,7 @@ def plot_correlations(model, rfield, pfield, obs, variable, region, season, fore
 
 # Function for plotting the results for all of the models as 12 subplots
 # TODO: Modify this function so that it works for the different historical cases
-def plot_correlations_subplots(models, obs, variable_data, variable, region, season, forecast_range, plots_dir, azores_grid, iceland_grid, uk_n_box, uk_s_box):
+def plot_correlations_subplots(models, obs, variable_data, variable, region, season, forecast_range, plots_dir, azores_grid, iceland_grid, uk_n_box, uk_s_box, p_sig = 0.05):
     """Plot the spatial correlation coefficients and p-values for all models.
 
     This function plots the spatial correlation coefficients and p-values
@@ -1566,6 +1566,8 @@ def plot_correlations_subplots(models, obs, variable_data, variable, region, sea
         Array of longitudes and latitudes for the northern UK index box.
     uk_s_box : array
         Array of longitudes and latitudes for the southern UK index box.
+    p_sig : float, optional
+        Significance threshold. The default is 0.05.
     """
 
     # Set the font size for the plots
@@ -1598,9 +1600,40 @@ def plot_correlations_subplots(models, obs, variable_data, variable, region, sea
     uk_n_lon1, uk_n_lon2 = uk_n_lon1 - 180, uk_n_lon2 - 180
     uk_s_lon1, uk_s_lon2 = uk_s_lon1 - 180, uk_s_lon2 - 180
 
-    # Set the figure size and subplot parameters
-    fig, axs = plt.subplots(nrows=4, ncols=3, figsize=(18, 16), subplot_kw={'projection': proj}, gridspec_kw={'wspace': 0.1})
+    # Count the number of models available
+    nmodels = len(models)
 
+    # Set the figure size and subplot parameters
+    if nmodels == 8:
+        fig, axs = plt.subplots(nrows=3, ncols=3, figsize=(18, 12), subplot_kw={'projection': proj}, gridspec_kw={'wspace': 0.1})
+        # Remove the last subplot
+        axs[-1, -1].remove()
+        # Set up where to plot the title
+        title_index = 1
+    elif nmodels == 10:
+        fig, axs = plt.subplots(nrows=4, ncols=3, figsize=(18, 16), subplot_kw={'projection': proj}, gridspec_kw={'wspace': 0.1})
+        # remove the last subplot
+        axs[-1, -1].remove()
+        # remove the second last subplot
+        axs[-1, -2].remove()
+        # Set up where to plot the title
+        title_index = 1
+    elif nmodels == 11:
+        fig, axs = plt.subplots(nrows=4, ncols=3, figsize=(18, 16), subplot_kw={'projection': proj}, gridspec_kw={'wspace': 0.1})
+        axs[-1, -1].remove()
+        # Set up where to plot the title
+        title_index = 1
+    elif nmodels == 12:
+        fig, axs = plt.subplots(nrows=4, ncols=3, figsize=(18, 16), subplot_kw={'projection': proj}, gridspec_kw={'wspace': 0.1})
+        # Set up where to plot the title
+        title_index = 1
+    else:
+        raise ValueError(f"Invalid number of models: {nmodels}")
+    
+    # Set up the significance threshold
+    # e.g. 0.05 for 95% significance
+    sig_threshold = int((1 - p_sig) * 100)
+    
     # Flatten the axs array
     axs = axs.flatten()
 
@@ -1610,14 +1643,15 @@ def plot_correlations_subplots(models, obs, variable_data, variable, region, sea
     # Loop over the models
     for i, model in enumerate(models):
         
-        # Print the model name
-        print("Processing model:", model)
+        # #print the model name
+        #print("Processing model:", model)
     
         # Convert the model to a single index list
         model = [model]
     
         # Calculate the spatial correlations for the model
-        rfield, pfield, obs_lons_converted, lons_converted = calculate_spatial_correlations(obs, variable_data, model, variable)
+        rfield, pfield, obs_lons_converted, lons_converted, ensemble_members_count = calculate_spatial_correlations(obs,
+                                                                                        variable_data, model, variable)
 
         # Set up the converted lons
         lons_converted = lons_converted - 180
@@ -1632,7 +1666,7 @@ def plot_correlations_subplots(models, obs, variable_data, variable, region, sea
             lats = obs.lat
             lons = lons_converted
         else:
-            print("Error: region not found")
+            #print("Error: region not found")
             sys.exit()
 
         # Set up the axes
@@ -1663,9 +1697,9 @@ def plot_correlations_subplots(models, obs, variable_data, variable, region, sea
         clevs_p = np.arange(0, 1.1, 0.1)
         # Plot the filled contours
         cf = ax.contourf(lons, lats, rfield, clevs, cmap='RdBu_r', transform=proj)
-    
+
         # replace values in pfield that are greater than 0.01 with nan
-        pfield[pfield > 0.05] = np.nan
+        pfield[pfield > p_sig] = np.nan
     
         # Add stippling where rfield is significantly different from zero
         ax.contourf(lons, lats, pfield, hatches=['....'], alpha=0, transform=proj)
@@ -1679,7 +1713,7 @@ def plot_correlations_subplots(models, obs, variable_data, variable, region, sea
         elif len(model) > 1:
             model = "all_models"
         else :
-            print("Error: model name not found")
+            #print("Error: model name not found")
             sys.exit()
     
         # Add textbox with model name
@@ -1687,6 +1721,11 @@ def plot_correlations_subplots(models, obs, variable_data, variable, region, sea
     
         # Add the contourf object to the list
         cf_list.append(cf)
+
+        # If this is the centre subplot on the first row, set the title for the figure
+        if i == title_index:
+            # Add title
+            ax.set_title(f"{variable} {region} {season} years {forecast_range} Correlation Coefficients, p < {p_sig} ({sig_threshold}%)", fontsize=12)
     
     # Create a single colorbar for all of the subplots
     cbar = plt.colorbar(cf_list[0], orientation='horizontal', pad=0.05, aspect=50, ax=fig.axes, shrink=0.8)
@@ -1696,7 +1735,7 @@ def plot_correlations_subplots(models, obs, variable_data, variable, region, sea
     # plt.tight_layout()
 
     # set up the path for saving the figure
-    fig_name = f"{variable}_{region}_{season}_{forecast_range}_correlation_coefficients_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
+    fig_name = f"{variable}_{region}_{season}_{forecast_range}_sig-{p_sig}_correlation_coefficients_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
     fig_path = os.path.join(plots_dir, fig_name)
 
     # # Adjust the vertical spacing between the plots
@@ -1707,7 +1746,6 @@ def plot_correlations_subplots(models, obs, variable_data, variable, region, sea
     
     # Show the figure
     plt.show()
-
 
 # Functions for choosing the observed data path
 # and full variable name
