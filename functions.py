@@ -385,7 +385,6 @@ def call_mergetime_regrid(model_dict, var, region):
                 if regridded_file is None:
                     print("Error, regridded file does not exist")
 
-# TODO - write a function to load the processed historical data
 # TODO - test the function
 # Define a new function to load the processed historical data
 # This function will take as arguments: the base directory 
