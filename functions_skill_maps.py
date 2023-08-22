@@ -1526,13 +1526,13 @@ def plot_correlations(model, rfield, pfield, obs, variable, region, season, fore
     # Include the experiment in the title if it is not None
     if experiment is not None:
         # Add title
-        plt.title(f"{model} {variable} {region} {season} {forecast_range} {experiment} {first_year}-{last_year} correlation coefficients, p < {p_sig} ({sig_threshold}%), N = {total_no_members}", fontsize=12)
+        plt.title(f"{model} {variable} {region} {season} {forecast_range} {experiment} {first_year}-{last_year} correlation coefficients, p < {p_sig} ({sig_threshold}%), N = {total_no_members}", fontsize=10)
 
         # Set up the figure name
         fig_name = f"{model}_{variable}_{region}_{season}_{forecast_range}_{experiment}_{total_no_members}_{p_sig}_correlation_coefficients_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
     else:
         # Add title
-        plt.title(f"{model} {variable} {region} {season} {forecast_range} {first_year}-{last_year} correlation coefficients, p < {p_sig} ({sig_threshold}%), N = {total_no_members}", fontsize=12)
+        plt.title(f"{model} {variable} {region} {season} {forecast_range} {first_year}-{last_year} correlation coefficients, p < {p_sig} ({sig_threshold}%), N = {total_no_members}", fontsize=10)
 
         # Set up the figure name
         fig_name = f"{model}_{variable}_{region}_{season}_{forecast_range}_{total_no_members}_{p_sig}_correlation_coefficients_{datetime.now().strftime('%Y%m%d_%H%M%S')}.png"
@@ -1744,7 +1744,7 @@ def plot_correlations_subplots(models, obs, variable_data, variable, region, sea
         # Add a textbook with the number of ensemble members
         total_no_members = sum(ensemble_members_count.values())
         # Include this textbox in the bottom right corner
-        ax.text(0.95, 0.05, f"N = {total_no_members}", transform=ax.transAxes, fontsize=12, fontweight='bold', va='bottom', ha='right', bbox=dict(facecolor='white', alpha=0.5))
+        ax.text(0.95, 0.05, f"N = {total_no_members}", transform=ax.transAxes, fontsize=10, fontweight='bold', va='bottom', ha='right', bbox=dict(facecolor='white', alpha=0.5))
     
         # Add the contourf object to the list
         cf_list.append(cf)
