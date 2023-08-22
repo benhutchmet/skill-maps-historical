@@ -1510,7 +1510,7 @@ def plot_correlations(model, rfield, pfield, obs, variable, region, season, fore
     else:
         first_year = None
         last_year = None
-        
+
     # Include the experiment in the title if it is not None
     if experiment is not None:
         # Add title
@@ -1534,6 +1534,7 @@ def plot_correlations(model, rfield, pfield, obs, variable, region, season, fore
     plt.show()
 
 # Function for plotting the results for all of the models as 12 subplots
+# TODO: Modify this function so that it works for the different historical cases
 def plot_correlations_subplots(models, obs, variable_data, variable, region, season, forecast_range, plots_dir, azores_grid, iceland_grid, uk_n_box, uk_s_box):
     """Plot the spatial correlation coefficients and p-values for all models.
 
