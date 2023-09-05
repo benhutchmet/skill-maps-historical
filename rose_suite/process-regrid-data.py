@@ -526,6 +526,9 @@ def main():
         # create a dictionary to store the data for each pressure level
         processed_data_plevs = {}
 
+        # Constrain plevs to the first four values to speed up the processing
+        pressure_levels = pressure_levels[0:3]
+
         # Now loop over the pressure levels
         for pressure_level in pressure_levels:
             print("processing pressure_level: ", pressure_level)
@@ -571,7 +574,7 @@ def main():
 
             # Calculate the running mean
             try:
-                # Calculate the running mean
+                # Calculate the running mean#
                 historical_data_constrained_plev_anoms_annual_mean_rm = calculate_running_mean(historical_data_constrained_plev_anoms_annual_mean, forecast_range)
 
                 # Print a message to the screen
@@ -610,8 +613,38 @@ def main():
             print("Unable to concatenate the data along the plev dimension")
             sys.exit()
 
+        # We want to loop over each pressure level and append the data for each member to a list
+        # We then want to concatenate the data along the plev dimension for each member
+        # We then want to store the data for each member in a dictionary
+        # create another dictionary which will store the data for all of the members for each pressure level
+        pressure_level_data = {}
+
+        # Loop over the members
+        for member in processed_data_plevs[pressure_levels[0]]:
+            # Create an empty list to store the data for each pressure level for this member
+            member_data = []
+
+            # Loop over the pressure levels
+            for pressure_level in pressure_levels:
+                # Extract the data for this member and pressure level
+                data = processed_data_plevs[pressure_level][member]
+
+                # Append the data to the list for this member
+                member_data.append(data)
+
+            # Concatenate the data for the pressure levels along the plev dimension
+            member_data_concat = xr.concat(member_data, dim='plev')
+
+            # Add the member coordinate to the concatenated data
+            member_data_concat.coords['member'] = member
+
+            # Store the concatenated data for this member in the pressure_level_data dictionary
+            pressure_level_data[member] = member_data_concat
+
         # Print the dimensions of the data
-        print("Dimensions of the data: ", processed_data.dims)
+        print("Member data: ", member_data)
+        # print the dimensions of the member_data
+        # print("Dimensions of the member_data: ", member_data.dims)
 
     else:
         print("Variable is not ua or va, so calculating and removing the model climatology for the variable at surface: ", variable)
@@ -690,7 +723,7 @@ def main():
     # Now loop over the members and save the data
     # for brevity
     if variable == 'ua' or variable == 'va':
-        data = processed_data
+        data = pressure_level_data
     else:
         data = historical_data_constrained_anoms_annual_mean_rm
 
