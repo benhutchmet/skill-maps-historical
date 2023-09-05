@@ -51,10 +51,6 @@ import xarray as xr
 from datetime import datetime
 import scipy.stats as stats
 
-# Import CDO
-from cdo import *
-cdo = Cdo()
-
 # Set up the location of the dictionaries
 dict_dir = '/home/users/benhutch/skill-maps-historical/'
 sys.path.append(dict_dir)
@@ -114,8 +110,12 @@ def load_data(model, variable, region):
         # Check if the file is a .nc file
         print("regrid_file: ", regrid_file)
         if regrid_file.endswith('.nc'):
-            # Open the file using xarray
-            data = xr.open_dataset(regrid_file, chunks={'time': 100, 'lat': 45, 'lon': 45})
+            if variable == 'ua' or variable == 'va':
+                # Open the file using xarray
+                data = xr.open_dataset(regrid_file, chunks={'time': 100, 'plev': 45, 'lat': 45, 'lon': 45})
+            else:
+                # Open the file using xarray
+                data = xr.open_dataset(regrid_file, chunks={'time': 100, 'lat': 45, 'lon': 45})
 
             # Extract the variant_label
             variant_label = data.attrs['variant_label']
@@ -193,6 +193,7 @@ def calculate_remove_model_climatology(historical_data_constrained, variable):
     For the selected season and years, calculate and remove the model climatology from each member.
     """
 
+
     # Concatenate the data along the variant_label dimension
     historical_data_constrained_ensemble = xr.concat(historical_data_constrained.values(), dim='variant_label')
 
@@ -204,7 +205,7 @@ def calculate_remove_model_climatology(historical_data_constrained, variable):
 
     # Check that the variable is valid
     # if the variable is contained within dic.variables, then it is valid
-    if variable in dic.variables:
+    if variable in dic.variables_new:
         # Print a message to the screen
         print("Variable is valid")
     else:
@@ -502,14 +503,28 @@ def main():
         # Extract the pressure levels from the data
         # The dimensions of the data are: (time, plev, lat, lon)
         try:
-            pressure_levels = historical_data_constrained.plev.values
+            # Extract the pressure levels from the data
+            # first loop over the members
+            for member in historical_data_constrained:
+                # Extract the pressure levels from the data
+                pressure_levels = historical_data_constrained[member].plev.values
+
+                # Print the pressure levels
+                print("pressure_levels: ", pressure_levels)
+
+                # Print the type of the pressure levels
+                print("type of pressure_levels: ", type(pressure_levels))
+
+                # If pressure_levels is not empty then break out of the loop
+                if len(pressure_levels) != 0:
+                    break
         except Exception as error:
             print(error)
             print("Unable to extract the pressure levels from the data")
             sys.exit()
 
         # create a dictionary to store the data for each pressure level
-        processed_data_plevs = []
+        processed_data_plevs = {}
 
         # Now loop over the pressure levels
         for pressure_level in pressure_levels:
@@ -517,7 +532,14 @@ def main():
 
             # Select the data for the pressure level
             try:
-                historical_data_constrained_plev = historical_data_constrained.sel(plev=pressure_level)
+                # Initialize historical_data_constrained_plev as a list
+                historical_data_constrained_plev = {}
+
+                # Select the data for the pressure level
+                # for each of the members
+                for member in historical_data_constrained:
+                    # Select the data for the pressure level
+                    historical_data_constrained_plev[member] = historical_data_constrained[member].sel(plev=pressure_level)
             except Exception as error:
                 print(error)
                 print("Unable to select the data for the pressure level: ", pressure_level)
@@ -560,11 +582,29 @@ def main():
                 sys.exit()
 
             # Add the data to the list
-            processed_data_plevs.append(historical_data_constrained_plev_anoms_annual_mean_rm)
+            processed_data_plevs[pressure_level] = historical_data_constrained_plev_anoms_annual_mean_rm
+
+        # create another dictionary which will store the data for all of the pressure levels for each member
+        member_data = {}
 
         # Concatenate the data along the plev dimension
         try:
-            processed_data = xr.concat(processed_data_plevs, dim='plev')
+            # Loop over the pressure levels
+            for pressure_level in processed_data_plevs:
+                # Create a dictionary to store the data for all of the members for this pressure level
+                pressure_level_data = {}
+
+                # Loop over the members
+                for member in processed_data_plevs[pressure_level]:
+                    # Extract the data for this member and pressure level
+                    data = processed_data_plevs[pressure_level][member]
+
+                    # Store the data in the dictionary for this pressure level
+                    pressure_level_data[member] = data
+
+                # Store the data for this pressure level in the member_data dictionary
+                member_data[pressure_level] = pressure_level_data
+
         except Exception as error:
             print(error)
             print("Unable to concatenate the data along the plev dimension")

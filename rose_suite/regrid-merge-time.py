@@ -284,6 +284,10 @@ def call_mergetime_regrid(model, variable, region):
         model_dictionary = dic.model_dictionary_sfcWind_historical_badc
     elif variable == 'rsds':
         model_dictionary = dic.model_dictionary_rsds_historical_badc
+    elif variable == 'ua':
+        model_dictionary = dic.model_dictionary_ua_historical_badc
+    elif variable == 'va':
+        model_dictionary = dic.model_dictionary_va_historical_badc
     else:
         print("Error, model_dictionary not found for variable: ", variable)
         return None

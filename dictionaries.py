@@ -199,7 +199,7 @@ model_dictionary_rsds_historical_badc = [
     {'model_name': 'MPI-ESM1-2-HR', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
     {'model_name': 'CanESM5', 'runs': '1-25', 'init_schemes': '1', 'physics_scheme': '1,2', 'forcing_scheme': '1'},
     {'model_name': 'CMCC-CM2-SR5', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
-    {'model_name': 'HadGEM3-GC31-MM', 'runs': '1-4', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '3'},
+    {'model_name': 'HadGEM3-GC31-MM', 'runs': '1-4', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
     {'model_name': 'EC-Earth3', 'runs': '1,2,22', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
     {'model_name': 'MPI-ESM1-2-LR', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
     {'model_name': 'FGOALS-f3-L', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
@@ -210,6 +210,43 @@ model_dictionary_rsds_historical_badc = [
 
 # set up the numbers for the rsds historical models
 model_dictionary_rsds_historical_badc_numbers = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12 ]
+
+# Define a model dictionary for the ua historical models
+model_dictionary_ua_historical_badc = [
+    {'model_name': 'BCC-CSM2-MR', 'runs': '1-3', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
+    {'model_name': 'MPI-ESM1-2-HR', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
+    {'model_name': 'CanESM5', 'runs': '10-20', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
+    {'model_name': 'CMCC-CM2-SR5', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
+    {'model_name': 'HadGEM3-GC31-MM', 'runs': '1-4', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
+    {'model_name': 'EC-Earth3', 'runs': '101-111', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
+    {'model_name': 'MPI-ESM1-2-LR', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
+    {'model_name': 'FGOALS-f3-L', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
+    {'model_name': 'MIROC6', 'runs': '10-20', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
+    {'model_name': 'IPSL-CM6A-LR', 'runs': '10-20', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
+    {'model_name': 'NorCPM1', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'}
+]
+
+# Set up the number for the ua historical models
+model_dictionary_ua_historical_badc_numbers = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12 ]
+
+# Define a model dictionary for the va historical models
+model_dictionary_va_historical_badc = [
+    {'model_name': 'BCC-CSM2-MR', 'runs': '1-3', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
+    {'model_name': 'MPI-ESM1-2-HR', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
+    {'model_name': 'CanESM5', 'runs': '10-20', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
+    {'model_name': 'CMCC-CM2-SR5', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
+    {'model_name': 'HadGEM3-GC31-MM', 'runs': '1-4', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
+    {'model_name': 'EC-Earth3', 'runs': '101-111', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
+    {'model_name': 'MPI-ESM1-2-LR', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
+    {'model_name': 'FGOALS-f3-L', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
+    {'model_name': 'MIROC6', 'runs': '10-20', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
+    {'model_name': 'IPSL-CM6A-LR', 'runs': '10-20', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
+    {'model_name': 'NorCPM1', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'}
+]
+
+# Set up the number for the va historical models
+model_dictionary_va_historical_badc_numbers = [ 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 12 ]
+
 
 # Set up the rsds models list
 # 11 models
@@ -241,3 +278,7 @@ season_timeshift = [
 ]
 
 variables = [ 'psl', 'tas', 'sfcWind', 'rsds', 'tos' ]
+
+# New variables to replace sfcWind with ua and va (at 850hPa)
+# Also ignoring tos for now (similar to tas)
+variables_new = [ 'psl', 'tas', 'ua', 'va', 'rsds' ]
