@@ -493,66 +493,148 @@ def main():
         sys.exit()
 
     # Calculate and remove the model climatology for the selected season and years
-    try:
-        # Calculate and remove the model climatology for the selected season and years
-        historical_data_constrained_anoms = calculate_remove_model_climatology(historical_data_constrained, variable)
+    # TODO: modify this step so that anoms are calculated for each pressure level
 
-        # Print a message to the screen
-        print('Calculated and removed the model climatology...')
+    # If statement to check if the variable is ua or va
+    if variable == 'ua' or variable == 'va':
+        print("Variable is ua or va, so calculating and removing the model climatology for each pressure level")
 
-        # # Print the values of the data
-        # print("Values of the data: ", historical_data_constrained_anoms.values)
+        # Extract the pressure levels from the data
+        # The dimensions of the data are: (time, plev, lat, lon)
+        try:
+            pressure_levels = historical_data_constrained.plev.values
+        except Exception as error:
+            print(error)
+            print("Unable to extract the pressure levels from the data")
+            sys.exit()
 
-        # Print the time taken
-        print("Time taken to calculate and remove the model climatology: ", time.time() - start_time, " seconds")
-    except Exception as error:
-        print(error)
-        print("Unable to calculate and remove the model climatology in main...")
-        sys.exit()
+        # create a dictionary to store the data for each pressure level
+        processed_data_plevs = []
 
-    # Calculate the annual mean anomalies
-    try:
+        # Now loop over the pressure levels
+        for pressure_level in pressure_levels:
+            print("processing pressure_level: ", pressure_level)
+
+            # Select the data for the pressure level
+            try:
+                historical_data_constrained_plev = historical_data_constrained.sel(plev=pressure_level)
+            except Exception as error:
+                print(error)
+                print("Unable to select the data for the pressure level: ", pressure_level)
+                sys.exit()
+
+            # Calculate and remove the model climatology for the selected season and years
+            try:
+                # Calculate and remove the model climatology for the selected season and years
+                historical_data_constrained_plev_anoms = calculate_remove_model_climatology(historical_data_constrained_plev, variable)
+
+                # Print a message to the screen
+                print('Calculated and removed the model climatology...')
+            except Exception as error:
+                print(error)
+                print("Unable to calculate and remove the model climatology in main for pressure level: ", pressure_level)
+                sys.exit()
+
+            # Calculate the annual mean anomalies
+            try:
+                # Calculate the annual mean anomalies
+                historical_data_constrained_plev_anoms_annual_mean = annual_mean_anoms(historical_data_constrained_plev_anoms, season)
+
+                # Print a message to the screen
+                print('Calculated the annual mean anomalies')
+            except Exception as error:
+                print(error)
+                print("Unable to calculate the annual mean anomalies in main for pressure level: ", pressure_level)
+                sys.exit()
+
+            # Calculate the running mean
+            try:
+                # Calculate the running mean
+                historical_data_constrained_plev_anoms_annual_mean_rm = calculate_running_mean(historical_data_constrained_plev_anoms_annual_mean, forecast_range)
+
+                # Print a message to the screen
+                print('Calculated the running mean')
+            except Exception as error:
+                print(error)
+                print("Unable to calculate the running mean in main for pressure level: ", pressure_level)
+                sys.exit()
+
+            # Add the data to the list
+            processed_data_plevs.append(historical_data_constrained_plev_anoms_annual_mean_rm)
+
+        # Concatenate the data along the plev dimension
+        try:
+            processed_data = xr.concat(processed_data_plevs, dim='plev')
+        except Exception as error:
+            print(error)
+            print("Unable to concatenate the data along the plev dimension")
+            sys.exit()
+
+        # Print the dimensions of the data
+        print("Dimensions of the data: ", processed_data.dims)
+
+    else:
+        print("Variable is not ua or va, so calculating and removing the model climatology for the variable at surface: ", variable)
+        try:
+            # Calculate and remove the model climatology for the selected season and years
+            historical_data_constrained_anoms = calculate_remove_model_climatology(historical_data_constrained, variable)
+
+            # Print a message to the screen
+            print('Calculated and removed the model climatology...')
+
+            # # Print the values of the data
+            # print("Values of the data: ", historical_data_constrained_anoms.values)
+
+            # Print the time taken
+            print("Time taken to calculate and remove the model climatology: ", time.time() - start_time, " seconds")
+        except Exception as error:
+            print(error)
+            print("Unable to calculate and remove the model climatology in main...")
+            sys.exit()
+
         # Calculate the annual mean anomalies
-        historical_data_constrained_anoms_annual_mean = annual_mean_anoms(historical_data_constrained_anoms, season)
+        try:
+            # Calculate the annual mean anomalies
+            historical_data_constrained_anoms_annual_mean = annual_mean_anoms(historical_data_constrained_anoms, season)
 
-        # Print a message to the screen
-        print('Calculated the annual mean anomalies')
+            # Print a message to the screen
+            print('Calculated the annual mean anomalies')
 
-        # # Print the data
-        # print("Data: ", historical_data_constrained_anoms_annual_mean)
+            # # Print the data
+            # print("Data: ", historical_data_constrained_anoms_annual_mean)
 
-        # Print the time taken
-        print("Time taken to calculate the annual mean anomalies: ", time.time() - start_time, " seconds")
-    except Exception as error:
-        print(error)
-        print("Unable to calculate the annual mean anomalies in main")
-        sys.exit()
+            # Print the time taken
+            print("Time taken to calculate the annual mean anomalies: ", time.time() - start_time, " seconds")
+        except Exception as error:
+            print(error)
+            print("Unable to calculate the annual mean anomalies in main")
+            sys.exit()
 
-    # Calculate the running mean
-    try:
         # Calculate the running mean
-        historical_data_constrained_anoms_annual_mean_rm= calculate_running_mean(historical_data_constrained_anoms_annual_mean, forecast_range)
+        try:
+            # Calculate the running mean
+            historical_data_constrained_anoms_annual_mean_rm= calculate_running_mean(historical_data_constrained_anoms_annual_mean, forecast_range)
 
-        # Print a message to the screen
-        print('Calculated the running mean')
+            # Print a message to the screen
+            print('Calculated the running mean')
 
-        # # Print the data
-        print("Data: ", historical_data_constrained_anoms_annual_mean_rm)
+            # # Print the data
+            print("Data: ", historical_data_constrained_anoms_annual_mean_rm)
 
-        # # Loop over the members
-        # for member in historical_data_constrained_anoms_annual_mean_rm:
-        #     # Print the member
-        #     print("Member: ", member)
+            # # Loop over the members
+            # for member in historical_data_constrained_anoms_annual_mean_rm:
+            #     # Print the member
+            #     print("Member: ", member)
 
-        #     # Print the psl values of the member
-        #     print("Psl values of the member: ", historical_data_constrained_anoms_annual_mean_rm[member].psl.values)
+            #     # Print the psl values of the member
+            #     print("Psl values of the member: ", historical_data_constrained_anoms_annual_mean_rm[member].psl.values)
 
-        # Print the time taken
-        print("Time taken to calculate the running mean: ", time.time() - start_time, " seconds")
-    except Exception as error:
-        print(error)
-        print("Unable to calculate the running mean in main")
-        sys.exit()
+            # Print the time taken
+            print("Time taken to calculate the running mean: ", time.time() - start_time, " seconds")
+        except Exception as error:
+            print(error)
+            print("Unable to calculate the running mean in main")
+            sys.exit()
 
     # Print a message to the screen
     print('Data processing complete, saving the data for ' + model + ' ' + variable + ' ' + region + ' ' + season + ' ' + forecast_range + ' ' + start_year + ' ' + end_year)
@@ -567,7 +649,12 @@ def main():
 
     # Now loop over the members and save the data
     # for brevity
-    data = historical_data_constrained_anoms_annual_mean_rm
+    if variable == 'ua' or variable == 'va':
+        data = processed_data
+    else:
+        data = historical_data_constrained_anoms_annual_mean_rm
+
+    # Loop over the members
     for member in data:
         # Print that we are saving the data
         print("Saving the data for member: ", member, "and model:", model)

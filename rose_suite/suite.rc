@@ -6,8 +6,8 @@
         final_year=2019
         variable="psl"
         region="global"
-        forecast_range="2-9"
-        season="SON"
+        forecast_range="2-3"
+        season="MAM"
 
 [scheduling]
     [[dependencies]]
@@ -38,5 +38,5 @@
         python process-regrid-data.py ${CYLC_TASK_PARAM_model} ${CYLC_TASK_PARAM_variable} ${CYLC_TASK_PARAM_region} ${CYLC_TASK_PARAM_season} ${CYLC_TASK_PARAM_forecast_range} ${CYLC_TASK_PARAM_initial_year} ${CYLC_TASK_PARAM_final_year}
         """
         [[[job]]]
-            execution time limit = PT30M
+            execution time limit = PT60M
         
