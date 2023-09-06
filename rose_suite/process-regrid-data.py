@@ -526,9 +526,6 @@ def main():
         # create a dictionary to store the data for each pressure level
         processed_data_plevs = {}
 
-        # Constrain plevs to the first four values to speed up the processing
-        pressure_levels = pressure_levels[0:3]
-
         # Now loop over the pressure levels
         for pressure_level in pressure_levels:
             print("processing pressure_level: ", pressure_level)
