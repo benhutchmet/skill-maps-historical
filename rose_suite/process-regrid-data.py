@@ -497,7 +497,10 @@ def main():
     # If the variable is ua or va then we need to select the 850 level
     if variable == 'ua' or variable == 'va':
         print("Variable is ua or va, so selecting the 850 level")
-        historical_data_constrained = historical_data_constrained.sel(plev=85000)
+        # Loop over the members
+        for member in historical_data_constrained:
+            # Select the 850 level
+            historical_data_constrained[member] = historical_data_constrained[member].sel(plev=85000)
     else:
         print("Variable is not ua or va, so not just using the surface level")
         historical_data_constrained = historical_data_constrained
@@ -576,10 +579,7 @@ def main():
 
     # Now loop over the members and save the data
     # for brevity
-    if variable == 'ua' or variable == 'va':
-        data = pressure_level_data
-    else:
-        data = historical_data_constrained_anoms_annual_mean_rm
+    data = historical_data_constrained_anoms_annual_mean_rm
 
     # Loop over the members
     for member in data:
