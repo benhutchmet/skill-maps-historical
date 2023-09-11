@@ -494,7 +494,6 @@ def main():
         sys.exit()
 
     # Calculate and remove the model climatology for the selected season and years
-    # TODO: modify this step so that anoms are calculated for only 850 level in this case
     # If the variable is ua or va then we need to select the 850 level
     if variable == 'ua' or variable == 'va':
         print("Variable is ua or va, so selecting the 850 level")
