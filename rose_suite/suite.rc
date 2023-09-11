@@ -1,7 +1,7 @@
 [cylc]
     UTC mode = True # Ignore DST
     [[parameters]]
-        model="HadGEM3-GC31-MM"
+        model=5,10
         initial_year=1960
         final_year=2019
         variable="ua"
