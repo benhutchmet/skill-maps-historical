@@ -6,6 +6,7 @@
     // , "DJFM", "2-9", "1960", "2014" ]
     "version": "0.2.0",
     "configurations": [
+        
         {
             "name": "Python: Current File",
             "type": "python",

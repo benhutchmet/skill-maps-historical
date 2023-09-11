@@ -217,12 +217,12 @@ model_dictionary_ua_historical_badc = [
     {'model_name': 'MPI-ESM1-2-HR', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
     {'model_name': 'CanESM5', 'runs': '10-20', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
     {'model_name': 'CMCC-CM2-SR5', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
-    {'model_name': 'HadGEM3-GC31-MM', 'runs': '1-4', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
+    {'model_name': 'HadGEM3-GC31-MM', 'runs': '1-4', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '3'},
     {'model_name': 'EC-Earth3', 'runs': '101-111', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
     {'model_name': 'MPI-ESM1-2-LR', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
     {'model_name': 'FGOALS-f3-L', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
     {'model_name': 'MIROC6', 'runs': '10-20', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
-    {'model_name': 'IPSL-CM6A-LR', 'runs': '10-20', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
+    {'model_name': 'IPSL-CM6A-LR', 'runs': '1-10', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
     {'model_name': 'NorCPM1', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'}
 ]
 
@@ -235,12 +235,12 @@ model_dictionary_va_historical_badc = [
     {'model_name': 'MPI-ESM1-2-HR', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
     {'model_name': 'CanESM5', 'runs': '10-20', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
     {'model_name': 'CMCC-CM2-SR5', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
-    {'model_name': 'HadGEM3-GC31-MM', 'runs': '1-4', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
+    {'model_name': 'HadGEM3-GC31-MM', 'runs': '1-4', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '3'},
     {'model_name': 'EC-Earth3', 'runs': '101-111', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
     {'model_name': 'MPI-ESM1-2-LR', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
     {'model_name': 'FGOALS-f3-L', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
     {'model_name': 'MIROC6', 'runs': '10-20', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
-    {'model_name': 'IPSL-CM6A-LR', 'runs': '10-20', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
+    {'model_name': 'IPSL-CM6A-LR', 'runs': '1-10', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
     {'model_name': 'NorCPM1', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'}
 ]
 
