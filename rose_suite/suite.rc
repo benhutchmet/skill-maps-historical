@@ -1,7 +1,7 @@
 [cylc]
     UTC mode = True # Ignore DST
     [[parameters]]
-        model=5,10
+        model=6
         initial_year=1960
         final_year=2019
         variable="ua"
