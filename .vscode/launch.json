@@ -12,7 +12,7 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "justMyCode": true,
-            "args": [ "HadGEM3-GC31-MM", "ua", "global"]
+            "args": [ "MIROC6", "ua", "global", "DJFM", "2-9", "1960", "2014" ]
         }
     ]
 }
