@@ -50,6 +50,7 @@ import pandas as pd
 import xarray as xr
 from datetime import datetime
 import scipy.stats as stats
+import cftime
 
 # Set up the location of the dictionaries
 dict_dir = '/home/users/benhutch/skill-maps-historical/'
@@ -174,8 +175,15 @@ def select_season_years(historical_data, season, start_year, end_year):
             # First select the years
             historical_data[member] = historical_data[member].sel(time=slice(str(start_year), str(end_year)))
 
+
+            # Get the type of the time values
+            print("Type of time values: ", type(historical_data[member].time[0]))
+
             # Select the months
-            historical_data[member] = historical_data[member].sel(time=historical_data[member]['time.month'].isin(months))
+            if isinstance(historical_data[member].time[0], cftime.datetime):
+                historical_data[member] = historical_data[member].sel(time=historical_data[member].time.dt.month.isin(months))
+            else:
+                historical_data[member] = historical_data[member].sel(time=historical_data[member]['time.month'].isin(months))
 
         # print the dimensions of the data for the first member
         # print("data post processing: ", historical_data)
