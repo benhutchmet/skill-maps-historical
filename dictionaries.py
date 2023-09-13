@@ -239,7 +239,7 @@ model_dictionary_va_historical_badc = [
     {'model_name': 'EC-Earth3', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
     {'model_name': 'MPI-ESM1-2-LR', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
     {'model_name': 'FGOALS-f3-L', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
-    {'model_name': 'MIROC6', 'runs': '10-20', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
+    {'model_name': 'MIROC6', 'runs': '1-10', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
     {'model_name': 'IPSL-CM6A-LR', 'runs': '1-10', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'},
     {'model_name': 'NorCPM1', 'runs': '1', 'init_schemes': '1', 'physics_scheme': '1', 'forcing_scheme': '1'}
 ]
