@@ -2,8 +2,6 @@
     // Use IntelliSense to learn about possible attributes.
     // Hover to view descriptions of existing attributes.
     // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
-    //  "DJFM", "2-9", "1960", "2014"
-    // , "DJFM", "2-9", "1960", "2014" ]
     "version": "0.2.0",
     "configurations": [
         
@@ -14,7 +12,7 @@
             "program": "${file}",
             "console": "integratedTerminal",
             "justMyCode": true,
-            "args": [ "EC-Earth3", "ua", "north-atlantic", "DJFM", "2-9", "1960", "2014" ]
+            "args": [ "MIROC6", "ua", "global", "DJFM", "2-9", "1960", "2014" ]
         }
     ]
 }
