@@ -281,4 +281,4 @@ variables = [ 'psl', 'tas', 'sfcWind', 'rsds', 'tos' ]
 
 # New variables to replace sfcWind with ua and va (at 850hPa)
 # Also ignoring tos for now (similar to tas)
-variables_new = [ 'psl', 'tas', 'ua', 'va', 'rsds' ]
+variables_new = [ 'psl', 'tas', 'ua', 'va', 'rsds', 'tos', 'sfcWind' ]
