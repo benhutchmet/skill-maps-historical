@@ -21,9 +21,9 @@ the annual mean. Or just take the annual mean if the season does not cross the y
 Usage:
 ------
 
-    python process-regrid-data.py <model> <variable> <region> <season> <forecast_range> <start_year> <end_year>
+    python process-regrid-data.py <model> <variable> <region> <season> <forecast_range> <start_year> <end_year> <pressure_level>
 
-    e.g. python process-regrid-data.py HadGEM3-GC31-MM tas global DJFM 2-9 1960 2014
+    e.g. python process-regrid-data.py HadGEM3-GC31-MM tas global DJFM 2-9 1960 2014 92500
 
     model: Model name (e.g. HadGEM3-GC31-MM) or '5'.
     variable: Variable name (e.g. tas).
@@ -32,6 +32,7 @@ Usage:
     forecast_range: Forecast range (e.g. 2-9).
     start_year: Start year (e.g. 1960).
     end_year: End year (e.g. 2014).
+    pressure_level: Pressure level (e.g. 92500).
 ----------------
 """
 
@@ -430,6 +431,7 @@ def main():
     parser.add_argument('forecast_range', type=str, help='Forecast range (e.g. 2-9).')
     parser.add_argument('start_year', type=str, help='Start year (e.g. 1960).')
     parser.add_argument('end_year', type=str, help='End year (e.g. 2014).')
+    parser.add_argument('pressure_level', type=str, help='Pressure level (e.g. 92500).')
 
     # Extract the arguments
     args = parser.parse_args()
@@ -442,9 +444,10 @@ def main():
     forecast_range = args.forecast_range
     start_year = args.start_year
     end_year = args.end_year
+    pressure_level = args.pressure_level
 
     # Print a message to the screen
-    print('Processing data for ' + model + ' ' + variable + ' ' + region + ' ' + season + ' ' + forecast_range + ' ' + start_year + ' ' + end_year + '...')
+    print('Processing data for ' + model + ' ' + variable + ' ' + region + ' ' + season + ' ' + forecast_range + ' ' + start_year + ' ' + end_year + ' ' + pressure_level + '...')
 
     # If the model is a number then convert it to a string
     if model.isdigit():
@@ -504,11 +507,11 @@ def main():
     # Calculate and remove the model climatology for the selected season and years
     # If the variable is ua or va then we need to select the 925 level
     if variable == 'ua' or variable == 'va':
-        print("Variable is ua or va, so selecting the 925 level")
+        print("Variable is ua or va, so selecting the", pressure_level, "level")
         # Loop over the members
         for member in historical_data_constrained:
             # Select the 925 level
-            historical_data_constrained[member] = historical_data_constrained[member].sel(plev=92500)
+            historical_data_constrained[member] = historical_data_constrained[member].sel(plev=pressure_level)
     else:
         print("Variable is not ua or va, so not just using the surface level")
         historical_data_constrained = historical_data_constrained
@@ -579,7 +582,7 @@ def main():
 
     # Set up the path for saving the data
     # /home/users/benhutch/skill-maps-processed-data/psl/EC-Earth3/global/years_2-9/DJFM/outputs/mergetime
-    save_path = dic.home_dir + '/' + 'skill-maps-processed-data' + '/' + 'historical' + '/' + variable + '/' + model + '/' + region + '/' + 'years_' + forecast_range + '/' + season + '/' + 'outputs' + '/' + 'processed'
+    save_path = dic.home_dir + '/' + 'skill-maps-processed-data' + '/' + 'historical' + '/' + variable + '/' + model + '/' + region + '/' + 'years_' + forecast_range + '/' + season + '/' + pressure_level + '/' + 'outputs' + '/' + 'processed'
 
     # If the save path does not exist then create it
     if not os.path.exists(save_path):
