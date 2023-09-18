@@ -508,7 +508,7 @@ def main():
         # Loop over the members
         for member in historical_data_constrained:
             # Select the 850 level
-            historical_data_constrained[member] = historical_data_constrained[member].sel(plev=85000)
+            historical_data_constrained[member] = historical_data_constrained[member].sel(plev=92500)
     else:
         print("Variable is not ua or va, so not just using the surface level")
         historical_data_constrained = historical_data_constrained
