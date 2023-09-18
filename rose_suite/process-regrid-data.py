@@ -502,12 +502,12 @@ def main():
         sys.exit()
 
     # Calculate and remove the model climatology for the selected season and years
-    # If the variable is ua or va then we need to select the 850 level
+    # If the variable is ua or va then we need to select the 925 level
     if variable == 'ua' or variable == 'va':
-        print("Variable is ua or va, so selecting the 850 level")
+        print("Variable is ua or va, so selecting the 925 level")
         # Loop over the members
         for member in historical_data_constrained:
-            # Select the 850 level
+            # Select the 925 level
             historical_data_constrained[member] = historical_data_constrained[member].sel(plev=92500)
     else:
         print("Variable is not ua or va, so not just using the surface level")
